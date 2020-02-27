@@ -1,0 +1,56 @@
+# English localization file for Sparky Backup Server.
+# Copyright 2018 Paweł "pavroo" Pijanowski <pavroo@onet.eu> 2018/09/26
+# Under the GNU GPL v2
+# Last update 2019/03/17 by pavroo
+#
+# INFO FOR TRANSLATORS : When you find "\n" means a breakline into the dialog box, so text appear next line
+#                           If you feel the text will look better "cutted" here or there for your language
+#                           This can be used or changed from the original place. Thanks!
+#
+LOCAL1="Internet connection test failed!"
+LOCAL2="On-line instalation of a server appilance can NOT be done!"
+LOCAL3="Exiting now..."
+LOCAL4="The server configuration is targeted to Debian/Sparky stable line only."
+LOCAL5="This is Sparky Active Directory (AD) post-install script which will install and set all you need to run AD simple file Server."
+LOCAL6="Continue?"
+LOCAL7="Sparky AD Server Installer"
+LOCAL8="You haven't finished Sparky AD Server configuration before.\nWould you like to continue configuration from the point you stopped or start from the beginning?"
+LOCAL9="Start from the beginning"
+LOCAL10="Continue from point install stoped before"
+LOCAL11="You finished Sparky AD Server configuration already.\nWould you like to start it again from the beginning? \n (WARNING THIS WILL ERASE ANY CONFIGURATION PREVIOUSLY DONE!!)"
+#
+LOCAL106="Would you like to use the already configured domain name?"
+LOCAL107="Enter the desired TLD name, use an invalid one other than .local or .internal;  \n15 characters maximum, no spaces, dots or special characters;\nhint: host.lan.>> intranet << ; If you do not enter any name, the default name intranet will be used."
+LOCAL108="Enter the desired server name;\nThis will be this machine name on network; \n15 characters maximum, no spaces, dots or special characters; \nhint: >> host <<.lan.intranet ; If you do not enter any name, the default name server will be used."
+LOCAL109="Is there more than one network card or port to be bonded?"
+LOCAL110="This package is not available for your system version."
+LOCAL111="Do you want to install support for an uninterruptible power supply (UPS,No-Break)?"
+LOCAL112="Do you want to check the automatic fixed actual network settings and/or set it manually?"
+LOCAL113="Can NOT find a network device interface,"
+LOCAL114="you HAVE to set it manually."
+LOCAL115="The network configuration will be as follows, do it as it is or stop installation."
+LOCAL116="Enter a name or names of your net devices, if you want to bond more then one; with spaces!"
+LOCAL117="you HAVE to set network manually!"
+LOCAL118="Do you want to install pcspeaker sound warning service sparky-beep?"
+LOCAL119="Enter the desired domain name. \nThis is where the name of the company is usualy inserted. \n15 characters maximum, no spaces, dots or special characters.; hint: host.>> lan <<.intranet"
+LOCAL120="If you do not enter any name, sparky will be used as default"
+LOCAL121="Enter the desired default administrator account password of samba, please follow the Microsoft standard for password complexity."
+LOCAL122="Enter the desired default administrator account password of samba again."
+LOCAL123="Passwords do not match. Lets try again."
+LOCAL124="Enter at least one DNS server to foward resolution outside the domain; if more than one separeted by space (set this to your firewall, gateway or google 8.8.8.8)."
+LOCAL125="If you none is provided, the 8.8.8.8 and 2001:4860:4860::8888 (google) DNS will be used as default"
+LOCAL126="Enter the desired site name (no special characters); hint: can be city name."
+LOCAL127="If you do not enter any site name, the name Earth will be used as default."
+LOCAL128="Would you like to share folders on this server other than the user folder?\nThe next window lets you configure a path of shared folder. All folders and sub-folders will be created, if not existent.\nDo NOT use the samba root name you created before."
+LOCAL129="Enter a path to shared folder in the lower window."
+LOCAL130="Enter the samba users root folder name which will be placed in home directory. It has to be different then any linux user name. Otherwise, sparkysmb will be used."
+LOCAL131="The samba root folder name is the same as the target linux user name, try another."
+LOCAL132="The shared root folder name contains the samba root name so it can NOT be used!"
+LOCAL133="The shared root folder name is empty, try again."
+LOCAL134="Do you want to share another folder on this server?\nThe next window lets you configure a path of shared folder. All folders and sub-folders will be created, if not existent.\nDo NOT use the samba root name you created before and a folder you already choosen to share."
+LOCAL135="Enter a name of shared folder. If you do not use any name, a sparkydir.XXXX will be used as default."
+LOCAL136="Reqired set of server targeted packages HAVE NOT been installed!"
+LOCAL137="Would you like to install and update Clamav antivirus? \n(recommended, but not required)"
+LOCAL138="Would you like to install netdata monitoring interface? \n(recommended but not required)"
+LOCAL139="Would you like to install webmin management interface? \n(recommended as default management interface, only say no if you know what you're doing.)"
+LOCAL140="Select yes to select an existant folder or no to create a new one"

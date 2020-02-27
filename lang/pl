@@ -1,0 +1,56 @@
+# Polish localization file for Sparky AD Server.
+# Copyright 2018 Paweł "pavroo" Pijanowski <pavroo@onet.eu> 2018/10/28
+# Under the GNU GPL v2
+# Last update 2019/03/17 by pavroo
+#
+# INFO FOR TRANSLATORS : When you find "\n" means a breakline into the dialog box, so text appear next line
+#                           If you feel the text will look better "cutted" here or there for your language
+#                           This can be used or changed from the original place. Thanks!
+#
+LOCAL1="Połączenie z internetem nieudane!"
+LOCAL2="Instalacja on-line aplikacji serwerowych nie może być przeprowadzona!"
+LOCAL3="Kończenie..."
+LOCAL4="Konfiguracja serwera jest przeznaczona tylko dla stabilnej linii Debian/Sparky."
+LOCAL5="To jest Sparky Active Directory skrypt poinstalacyjny, który zainstaluje i ustawi wszystko co potrzebujesz do uruchomienia serwera AD."
+LOCAL6="Kontynuować?"
+LOCAL7="Sparky AD Server Instalator"
+LOCAL8="Nie skończyłeś konfiguracji Sparky AD Server ostatnim razem.\nCzy chcesz kontynuować z miejsca, w którym ostatnio skończyłeś czy zacząć od początku?"
+LOCAL9="Zacznij od początku"
+LOCAL10="Kontynuuj z miejsca w którym skończyłeś"
+LOCAL11="Konfiguracja Sparky AD Server została już ukończona.\nCzy chcesz zacząć jeszcze raz od początku? \n (UWAGA, ZOSTANIE USUNIĘTA CAŁA POPRZEDNIA KONFIGURACJA!!)"
+#
+LOCAL106="Czy chcesz użyć już skonfigurowanej nazwy domeny?"
+LOCAL107="Wpisz nazwę TLD, użyj poprawnej nazwy raczej niż .local lub .internal; \nDo 15 znaków bez spacji, kropek lub znaków specjalnych; podpowiedź: host.lan.>> intranet << ; Jeśli nie wpiszesz żadnej nazwy, zostanie domyślnie użyta nazwa intranet."
+LOCAL108="Wpisz nazwę serwera;\nMoże być nazwa tej maszyny lub sieci; \nDo 15 znaków bez spacji, kropek i znaków specjalnych; podpowiedź: >> host <<.lan.intranet ; Jeśli nic nie zostanie wprowadzone, zostanie użyta domyślna nazwa server."
+LOCAL109="Czy istnieje więcej niż jedna karta sieciowa lub port do połączenia?"
+LOCAL110="Ten pakiet nie jest dostępny dla Twojej wersji systemu."
+LOCAL111="Czy chcesz zainstalować wsparcie dla zasilaczy awaryjnych (UPS)?"
+LOCAL112="Czy chcesz sprawdzić ustawienia sieciowe i/lub skonfigurować je ręcznie?"
+LOCAL113="NIE mogę znaleźć urządzeń interfejsów sieciowych,"
+LOCAL114="MUSISZ skonfigurować je ręcznie."
+LOCAL115="Wynik ifconfig jest następujący, więc zrób to teraz lub przerwij instalację."
+LOCAL116="Wpisz nazwę lub nazwy twoich urządzeń sieciowych, jeśli chcesz połączyć (bond) więcej niż jeden; ze spacją pomiędzy!"
+LOCAL117="MUSISZ skonfigurować sieć ręcznie!"
+LOCAL118="Czy chcesz zainstalować powiadomienia brzęczyka (beep)?"
+LOCAL119="Wpisz pełną nazwę domeny. \nZwykle jest to nazwa firmy. \nDo 15 znaków, bez spacji, kropek i znaków specjalnych.; podpowiedź: host.>> lan <<.intranet"
+LOCAL120="Jeśli nie wpiszesz żadnej nazwy, zostanie użyta nazwa sparky"
+LOCAL121="Podaj wymagane hasło dla konta administratora samba, proszę mieć na uwadze standard haseł Microsoft."
+LOCAL122="Podaj wymagane hasło dla konta administratora samba ponownie."
+LOCAL123="Hasła nie są jednakowe. Spróbuj ponownie."
+LOCAL124="Wpisz przynajmniej jeden serwer DNS, który będzie używany poza domeną; możesz użyć więcej niż jeden oddzielony spacją (konfiguracja dla zapory ogniowej, bramy dostępu lub google 8.8.8.8)."
+LOCAL125="Jeśli nie wpiszesz żadnego adresu DNS, zostanie domyślnie użyty 8.8.8.8 oraz  2001:4860:4860::8888 (google)"
+LOCAL126="Wpisz wymaganą nazwę strony (bez znaków specjalnych); podpowiedź: może być nazwa miasta."
+LOCAL127="Jeśli nie wpiszesz żadnej nazwy, nazwa London zostanie domyślnie użyta."
+LOCAL128="Czy chcesz udostępnić foldery na tym serwerze?\nW następnym oknie bedziesz mógł skonfigurować ścieżkę folder do udostępnienia. Udział zostanie utworzony, jeśli jeszcze nie istnieje.\nNIE używaj nazwy administratora samba, którą już utworzyłeś."
+LOCAL129="Wpisz ścieżkę udostępnianego folderu w dolnym oknie."
+LOCAL130="Wpisz nazwę dla administratora samba, która będzie użyta w katalogu domowym. Musi być inna niż nazwa użytkownika systemu. W przeciwnym wypadku zostanie użyta nazwa sparkysmb"
+LOCAL131="Nazwa administratora samba jest taka sama jak nazwa użytkownika systemu, spróbuj ponownie."
+LOCAL132="Nazwa udostępnianego folderu jest taka sama jak nazwa administratora samba, więc NIE może być użyta!"
+LOCAL133="Nazwa udostępnianego folderu jest pusta, spróbuj ponownie."
+LOCAL134="Czy chcesz udostępnieć kolejny folder na tym serwerze?\nW następnym oknie bedziesz mógł skonfigurować ścieżkę folder do udostępnienia. Udział zostanie utworzony, jeśli jeszcze nie istnieje.\nNIE używaj nazwy administratora samba, którą już utworzyłeś oraz nie nazwy foldery, który już udostępniłeś."
+LOCAL135="Wpisz nazwę folderu, który udostępniasz. Jeśli nie wpiszesz żadnej nazwy, zostanie użyta nazwa sparkydir.XXXX"
+LOCAL136="Wymagany zestaw pakietów o przeznaczeniu serwerowym NIE ZOSTAŁ zainstalowany!"
+LOCAL137="Czy chcesz zainstalować i zaktualizować program anywirusowy Clamav? \n(zalecane, lecz niewymagane)"
+LOCAL138="Czy chcesz zainstalować netdata do monitorowania interfejsu sieciowego? \n(zalecane, lecz niewymagane)"
+LOCAL139="Czy chcesz zainstalować webmin do zarządzania serwerem? \n(zalecany jako domyślny interfejs zarządzania, odpowiedz nie, jeśli wiesz, co robisz.)"
+LOCAL140="Wybierz tak, aby wybrać istniejący folder lub nie, aby utworzyć nowy"

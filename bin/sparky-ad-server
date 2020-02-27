@@ -1,0 +1,1267 @@
+#!/bin/bash
+
+# sparky-ad-server script lets you install and set up the server edition on the top of sparky installation
+# Copyright Paweł Pijanowski "pavroo" <pavroo@onet.eu> & Daniel Campos Ramos 2018/09/23
+# Under the GNU GPL3 License
+#
+# script deps: apt, bash, coreutils, dpkg, dialog, gawk, grep, hostname, nano, iputils-ping, sed, sparky-ntp-server
+#
+# Last update 2019/11/28 by pavroo
+
+# checking to make sure the script is running with root privileges
+TESTROOT=`whoami`
+if [ "$TESTROOT" != "root" ]; then
+	echo "Must be run as root... Exiting..."
+	exit 1
+fi
+
+# if Live system just quit, do nothing
+TESTMODE=`grep "1000" /etc/passwd | grep "Live"`
+if [ "$TESTMODE" != "" ]; then
+	echo "It is Live system! Exiting now..."
+	exit 1
+fi
+
+# register install file (so can detect already began install)
+touch /tmp/adinstallstart.$$
+
+# enable network-manager to fetch netconfig
+NTMNG=$(service network-manager status | grep dead)
+if [ "$NTMNG" = "   Active: inactive (dead)" ]; then
+	systemctl enable network-manager
+	service network-manager start
+else
+	echo "Network Manager enabled already"
+fi
+
+# get default's locale file
+DEFLOCDIR="/usr/share/sparky/sparky-ad-server"
+if [ "`cat /etc/default/locale | grep el`" != "" ]; then
+	export LOCAPT=el && . $DEFLOCDIR/el
+elif [ "`cat /etc/default/locale | grep fr`" != "" ]; then
+	export LOCAPT=fr && . $DEFLOCDIR/fr
+elif [ "`cat /etc/default/locale | grep hu`" != "" ]; then
+	export LOCAPT=hu && . $DEFLOCDIR/hu
+elif [ "`cat /etc/default/locale | grep it`" != "" ]; then
+	export LOCAPT=it && . $DEFLOCDIR/it
+elif [ "`cat /etc/default/locale | grep pl`" != "" ]; then
+	export LOCAPT=pl && . $DEFLOCDIR/pl
+elif [ "`cat /etc/default/locale | grep pt_BR`" != "" ]; then
+	export LOCAPT=pt-BR && . $DEFLOCDIR/pt_BR
+elif [ "`cat /etc/default/locale | grep ru`" != "" ]; then
+	export LOCAPT=ru && . $DEFLOCDIR/ru
+else
+	export LOCAPT=en && . $DEFLOCDIR/en
+fi
+
+# set options
+DIALOG=`which dialog`
+HEIGHT="17"
+WIDTH="75"
+HEIGHT2="8"
+WIDTH2="70"
+MENUHEIGHT="12"
+TITLE="--title "
+ENTRY="--inputbox "
+MENU="--menu"
+YESNO="--yesno "
+MSGBOX="--msgbox "
+PASSWORD="--passwordbox "
+DSELECT="--dselect "
+BACKTITLE="--backtitle "
+TITLETEXT=$LOCAL7
+ARCH64=`uname -m | grep x86_64`
+ARCH32=`uname -m | grep 686`
+
+### server ad installation log section ###
+echo "Creating install log file..."
+if [ -f /var/log/sparky-ad-server.log ]; then
+	rm -f /var/log/sparky-ad-server.log
+fi
+echo "AD Server Installer log" >> /var/log/sparky-ad-server.log
+echo "==============================================================" >> /var/log/sparky-ad-server.log
+
+if [ "$ARCH32" != "" ]; then
+	echo "32bit OS... OK, starting AD module installation..."
+	echo "32bit OS... OK, starting AD module installation..." >> /var/log/sparky-ad-server.log
+elif [ "$ARCH64" != "" ]; then
+	echo "64bit OS... OK, starting AD module installation..."
+	echo "64bit OS... OK, starting AD module installation..." >> /var/log/sparky-ad-server.log
+else
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX "$LOCAL110\n\n$LOCAL3" $HEIGHT $WIDTH
+	echo "No 64bit nor 32bit OS... exiting..." >> /var/log/sparky-ad-server.log
+	exit 1
+fi
+
+mainmenu ()
+{
+
+# check where did you stop last time, if not first run
+if [ -f /var/log/sparky-ad-steps.log ]; then
+	CHECKSTEPS=`cat /var/log/sparky-ad-steps.log | grep [0-9] | tail -n1`
+	if [ "$CHECKSTEPS" = "1" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MENU "$LOCAL8" $HEIGHT $WIDTH $MENUHEIGHT Restart "$LOCAL9" Continue "$LOCAL10" Exit "$LOCAL3" 2>/tmp/sparky-ad-steps
+		if [ "$?" = "0" ]; then
+			NEWJOB=`cat /tmp/sparky-ad-steps`
+			NEWSTEP="2"
+		else
+			echo "Exiting sparky-ad-server installation by user."
+			exit 1
+		fi
+	elif [ "$CHECKSTEPS" = "2" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MENU "$LOCAL8" $HEIGHT $WIDTH $MENUHEIGHT Restart "$LOCAL9" Continue "$LOCAL10" Exit "$LOCAL3" 2>/tmp/sparky-ad-steps
+		if [ "$?" = "0" ]; then
+			NEWJOB=`cat /tmp/sparky-ad-steps`
+			NEWSTEP="3"
+		else
+			echo "Exiting sparky-ad-server installation by user."
+			exit 1
+		fi
+	elif [ "$CHECKSTEPS" = "3" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MENU "$LOCAL8" $HEIGHT $WIDTH $MENUHEIGHT Restart "$LOCAL9" Continue "$LOCAL10" Exit "$LOCAL3" 2>/tmp/sparky-ad-steps
+		if [ "$?" = "0" ]; then
+			NEWJOB=`cat /tmp/sparky-ad-steps`
+			NEWSTEP="4"
+		else
+			echo "Exiting sparky-ad-server installation by user."
+			exit 1
+		fi
+	elif [ "$CHECKSTEPS" = "4" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MENU "$LOCAL8" $HEIGHT $WIDTH $MENUHEIGHT Restart "$LOCAL9" Continue "$LOCAL10" Exit "$LOCAL3" 2>/tmp/sparky-ad-steps
+		if [ "$?" = "0" ]; then
+			NEWJOB=`cat /tmp/sparky-ad-steps`
+			NEWSTEP="5"
+		else
+			echo "Exiting sparky-ad-server installation by user."
+			exit 1
+		fi
+	elif [ "$CHECKSTEPS" = "5" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MENU "$LOCAL8" $HEIGHT $WIDTH $MENUHEIGHT Restart "$LOCAL9" Continue "$LOCAL10" Exit "$LOCAL3" 2>/tmp/sparky-ad-steps
+		if [ "$?" = "0" ]; then
+			NEWJOB=`cat /tmp/sparky-ad-steps`
+			NEWSTEP="6"
+		else
+			echo "Exiting sparky-ad-server installation by user."
+			exit 1
+		fi
+	elif [ "$CHECKSTEPS" = "6" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MENU "$LOCAL8" $HEIGHT $WIDTH $MENUHEIGHT Restart "$LOCAL9" Continue "$LOCAL10" Exit "$LOCAL3" 2>/tmp/sparky-ad-steps
+		if [ "$?" = "0" ]; then
+			NEWJOB=`cat /tmp/sparky-ad-steps`
+			NEWSTEP="7"
+		else
+			echo "Exiting sparky-ad-server installation by user."
+			exit 1
+		fi
+	elif [ "$CHECKSTEPS" = "7" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MENU "$LOCAL8" $HEIGHT $WIDTH $MENUHEIGHT Restart "$LOCAL9" Continue "$LOCAL10" Exit "$LOCAL3" 2>/tmp/sparky-ad-steps
+		if [ "$?" = "0" ]; then
+			NEWJOB=`cat /tmp/sparky-ad-steps`
+			NEWSTEP="8"
+		else
+			echo "Exiting sparky-ad-server installation by user."
+			exit 1
+		fi
+	elif [ "$CHECKSTEPS" = "8" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MENU "$LOCAL8" $HEIGHT $WIDTH $MENUHEIGHT Restart "$LOCAL9" Continue "$LOCAL10" Exit "$LOCAL3" 2>/tmp/sparky-ad-steps
+		if [ "$?" = "0" ]; then
+			NEWJOB=`cat /tmp/sparky-ad-steps`
+			NEWSTEP="9"
+		else
+			echo "Exiting sparky-ad-server installation by user."
+			exit 1
+		fi
+	elif [ "$CHECKSTEPS" = "9" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MENU "$LOCAL11" $HEIGHT $WIDTH $MENUHEIGHT Restart "$LOCAL9" Exit "$LOCAL3" 2>/tmp/sparky-ad-steps
+		if [ "$?" = "0" ]; then
+			NEWJOB=`cat /tmp/sparky-ad-steps`
+		else
+			echo "Exiting sparky-ad-server installation by user."
+			exit 1
+		fi
+
+	fi
+
+	if [ "$NEWJOB" = "Restart" ]; then
+		menustep1
+	elif [ "$NEWJOB" = "Continue" ]; then
+		if [ "$NEWSTEP" = "2" ]; then
+			menustep2
+		elif [ "$NEWSTEP" = "3" ]; then
+			menustep3
+		elif [ "$NEWSTEP" = "4" ]; then
+			menustep4
+		elif [ "$NEWSTEP" = "5" ]; then
+			menustep5
+		elif [ "$NEWSTEP" = "6" ]; then
+			menustep6
+		elif [ "$NEWSTEP" = "7" ]; then
+			menustep7
+		elif [ "$NEWSTEP" = "8" ]; then
+			menustep8
+		elif [ "$NEWSTEP" = "9" ]; then
+			menustep9
+		fi
+	fi
+	rm -f /tmp/sparky-ad-steps
+else
+	touch /var/log/sparky-ad-steps.log
+fi
+
+}
+
+### step 1: install pre-requisites ####################################################
+menustep1 ()
+{
+
+SPARKYVERCHECK5=`cat /etc/apt/sources.list.d/sparky-testing.list | grep testing`
+SPARKYVERCHECK4=`cat /etc/apt/sources.list.d/sparky-stable.list | grep stable`
+DEBIANVERCHECK10=`cat /etc/apt/sources.list | grep -e testing -e buster`
+DEBIANVERCHECK9=`cat /etc/apt/sources.list | grep -e stable -e stretch`
+if [ "$SPARKYVERCHECK5" != "" ]; then
+	echo "$LOCAL4 $LOCAL3"
+	echo "It's Debian testing... exiting..." >> /var/log/sparky-ad-server.log
+	exit 1
+elif [ "$DEBIANVERCHECK10" != "" ]; then
+	echo "$LOCAL4 $LOCAL3"
+	echo "It's Debian Buster testing... exiting..." >> /var/log/sparky-ad-server.log
+	exit 1
+fi
+
+# add google DNSs to ensure resolving if firewall already configured to point AD as DNS or install stopped at middle
+chattr -i /etc/resolv.conf
+echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+echo "nameserver 2001:4860:4860::8888" >> /etc/resolv.conf
+
+# checking connection
+PINGTEST=$(ping -c 1 debian.org | grep [0-9])
+if [ "$PINGTEST" = "" ]; then
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX "$LOCAL1\n$LOCAL2\n\n$LOCAL3" $HEIGHT $WIDTH
+	echo "PING TEST=Internet connection not active, please connect to install from internet" >> /var/log/sparky-ad-server.log
+	exit 1
+else
+	echo "PING TEST=Internet connection OK"
+	echo "PING TEST=Internet connection OK" >> /var/log/sparky-ad-server.log
+fi
+
+## Inform about this program and ask to continue or not
+$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL5\n$LOCAL6" $HEIGHT $WIDTH
+if [ "$?" != "0" ]; then
+	echo "Exiting sparky-ad-server installation by user."
+	echo "Exiting sparky-ad-server installation by user." >> /var/log/sparky-ad-server.log
+	exit 1
+fi
+
+# pre install apt behaviour modification
+#APTOPT="/etc/apt/apt.conf.d/80packages"
+if [ -f /etc/apt/apt.conf.d/80packages ]; then
+	echo "APTOPT=Apt behaviour already exists"
+	echo "APTOPT=Apt behaviour already exists" >> /var/log/sparky-ad-server.log
+else
+	## enable recommended packages to be installed by default, so every optional is avaliable
+	touch /etc/apt/apt.conf.d/80packages
+	sed -i '1 c\APT::Install-Recommends "true";' /etc/apt/apt.conf.d/80packages
+	sed -i '2 c\APT::Install-Suggests "false";' /etc/apt/apt.conf.d/80packages
+	sed -i '3 c\Aptitude::Recommends-Important "true";' /etc/apt/apt.conf.d/80packages
+	sed -i '4 c\Acquire::Languages { "$LOCAPT"; "none"; };' /etc/apt/apt.conf.d/80packages
+	echo "APTOPT=Apt behaviour changed"
+	echo "APTOPT=Apt behaviour changed" >> /var/log/sparky-ad-server.log
+fi
+
+# as the meta is pre-installed, the step 1 checks to make sure all deps are on the board
+
+if [ "$ARCH64" != "" ]; then
+	# 64 bit multiarch
+	FOREIGN=`dpkg --print-foreign-architectures | grep i386`
+	if [ "$FOREIGN" = "" ]; then
+		dpkg --add-architecture i386
+	fi
+	DEBIAN_FRONTEND=noninteractive apt-get update
+	DEBIAN_FRONTEND=noninteractive apt-get install sparky-meta-server krb5-user ctdb tofrodos smbnetfs nmap openresolv krb5-admin-server krb5-kdc krb5-kdc-ldap krb5-kpropd libev4 libpam-krb5 -y
+	DEBIAN_FRONTEND=noninteractive apt-get update
+	update-command-not-found
+	SERVPACK="64bit"
+else
+	# 32 bit
+	DEBIAN_FRONTEND=noninteractive apt-get update
+	DEBIAN_FRONTEND=noninteractive apt-get install sparky-meta-server krb5-user ctdb tofrodos smbnetfs nmap openresolv krb5-admin-server krb5-kdc krb5-kdc-ldap krb5-kpropd libev4 libpam-krb5 -y
+	DEBIAN_FRONTEND=noninteractive apt-get update
+	update-command-not-found
+	SERVPACK="32bit"
+fi
+
+# check if the set of server apps was installed
+if [ -d /usr/share/doc/sparky-meta-server ]; then
+	echo "STEP1=$SERVPACK bit pre-requisites packages installed ok" >> /var/log/sparky-ad-server.log
+	echo "$SERVPACK pre-requisites packages were installed ok"
+else
+	echo "STEP1=$SERVPACK bit pre-requisites packages NOT installed" >> /var/log/sparky-ad-server.log
+	echo "$SERVPACK pre-requisites packages were NOT installed... Exiting..."
+	exit 1
+fi
+
+# check for acl capable file system at home directory
+touch /home/test.txt
+ACLCHK='setfacl -m g:adm:rwx /home/test.txt'
+if [ "$ACLCHK" != "" ]; then
+	echo "$ACLCHK"
+	echo "Your home folder partition do not have acl enabled, trying to enable..."
+	echo "STEP1=No home ACL enabled, try auto enable" >> /var/log/sparky-ad-server.log
+	# tune2fs -o acl,user_xattr /dev/
+	# mount /home -o remount,acl
+	# need to script something to add acl to fstab of home partition or root if no separated home
+else
+	echo "Home folder partition ACL support detected, continue install."
+	echo "STEP1=Already had home ACL enabled" >> /var/log/sparky-ad-server.log
+fi
+rm -rf /home/test.txt
+
+echo "1" >> /var/log/sparky-ad-steps.log
+menustep2
+}
+### end of step 1 ###
+
+### step 2: networking ###############################################################
+menustep2 ()
+{
+
+# find network devices
+if [ -f /tmp/ifconf0 ]; then
+	rm -f /tmp/ifconf0
+	rm -f /tmp/netdevs.$$
+	chattr -i /etc/network/interfaces
+fi
+ifconfig >> /tmp/ifconf0
+ip link | awk -F: '$0 !~ "lo|vir|wl|^[^0-9]"{print $2a;getline}' >> /tmp/netdevs.$$
+NETNAME0=`cat /tmp/ifconf0 | grep enp | cut -f1 -d":" | head -n2 | tail -n1`
+NETNAME1=`cat /tmp/ifconf0 | grep eth | cut -f1 -d":" | head -n2 | tail -n1`
+NETDEV0=$(awk 'NR==1' /tmp/netdevs.$$)
+NETDEV1=$(awk 'NR==2' /tmp/netdevs.$$)
+echo $NETDEV0 $NETDEV1 >> /tmp/bonddevices.$$
+INETDEVS=$(cat /tmp/bonddevices.$$)
+
+if [ "$NETNAME0" != "" ]; then
+	echo "STEP2=NETNAME0:INETDEV0 device=$NETNAME0" >> /var/log/sparky-ad-server.log
+	if [ "$NETDEV1" != "" ]; then
+		echo "STEP2=NETNAME0:INETDEV1 device=$INETDEVS" >> /var/log/sparky-ad-server.log
+		rm -rf /tmp/bonddevices.$$
+	else
+		echo "STEP2=NETNAME0:INETDEV0 device=$NETDEV0" >> /var/log/sparky-ad-server.log
+		INETDEV="$NETDEV0"
+	fi
+elif [ "$NETNAME1" != "" ]; then
+	echo "STEP2=NETNAME1:INETDEV0 device=$NETNAME1" >> /var/log/sparky-ad-server.log
+	if [ "$NETDEV1" != "" ]; then
+		echo "STEP2=NETNAME0:INETDEV1 device=$INETDEVS" >> /var/log/sparky-ad-server.log
+	else
+		echo "STEP2=NETNAME1:INETDEV0 device=$NETDEV0" >> /var/log/sparky-ad-server.log
+		INETDEV="$INETDEV0"
+	fi
+else
+	echo "STEP2=No supported ethernet network devices found, have to set it manually or check missing specific drivers" >> /var/log/sparky-ad-server.log
+	YOURIFCONFIG=`cat /tmp/ifconf0`
+	$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL113 $LOCAL114\n$LOCAL115\n\n$YOURIFCONFIG" $HEIGHT $WIDTH
+	if [ "$?" = "0" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL116" $HEIGHT $WIDTH 2>/tmp/serverchoice.$$
+		INETDEV=$(cat /tmp/serverchoice.$$)
+		NETNAME2=$(ip link | awk -F: '$0 !~ "lo|vir|wl|^[^0-9]"{print $2a;getline}')
+		echo "STEP2=manually added network device=$INETDEV" >> /var/log/sparky-ad-server.log
+		rm /tmp/serverchoice.$$
+	else
+		# no eth devices found, set interfaces manually
+		$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL113 $LOCAL117" $HEIGHT $WIDTH
+		if [ "$?" = "0" ]; then
+			nano /etc/network/interfaces
+			/etc/init.d/networking stop && /etc/init.d/networking start
+		else
+			echo "Cannot install, no network, exiting."
+			echo "STEP2=Cannot install, no network, exiting." >> /var/log/sparky-ad-server.log
+			exit 1
+		fi
+	fi
+fi
+
+# find address, netmask, network, broadcast, gateway
+# ipv6 example aaaa::bbbb:cccc:dddd:eeee
+#NET6WORK1=`cat /tmp/ifconf0 | grep inet6 | head -n1 | awk '{print $2}' | cut -f1 -d":"`
+#NET6WORK2=`cat /tmp/ifconf0 | grep inet6 | head -n1 | awk '{print $2}' | cut -f3 -d":"`
+#NET6WORK3=`cat /tmp/ifconf0 | grep inet6 | head -n1 | awk '{print $2}' | cut -f4 -d":"`
+#NET6WORK4=`cat /tmp/ifconf0 | grep inet6 | head -n1 | awk '{print $2}' | cut -f5 -d":"`
+#NET6WORK5=`cat /tmp/ifconf0 | grep inet6 | head -n1 | awk '{print $2}' | cut -f6 -d":"`
+
+NETWORK1=`cat /tmp/ifconf0 | grep inet | head -n1 | cut -f2 -d":" | awk '{print $2}' | cut -f1 -d"."`
+NETWORK2=`cat /tmp/ifconf0 | grep inet | head -n1 | cut -f2 -d":" | awk '{print $2}' | cut -f2 -d"."`
+NETWORK3=`cat /tmp/ifconf0 | grep inet | head -n1 | cut -f2 -d":" | awk '{print $2}' | cut -f3 -d"."`
+NETMASK0=`cat /tmp/ifconf0 | grep inet | head -n1 | cut -f2 -d":" | awk '{print $4}'`
+BROADCAST0=`cat /tmp/ifconf0 | grep inet | head -n1 | cut -f2 -d":" | awk '{print $6}'`
+GATEWAY4=`route -n | grep UG | awk '{print $2}' | cut -f4 -d"."`
+if [ "$GATEWAY4" = "1" ]; then
+	NETWORK4="2"
+elif [ "$GATEWAY4" = "254" ]; then
+	NETWORK4="253"
+else
+	NETWORK4="1"
+fi
+
+GATEWAY0=`route -n | grep UG | awk '{print $2}'`
+if [ "$NETNAME0" != "" ]; then
+	NETCONF="OK"
+elif [ "$NETNAME1" != "" ]; then
+	NETCONF="OK"
+elif [ "$NETNAME2" != "" ]; then
+	NETCONF="OK"
+else
+	NETCONF="failed"
+fi
+
+if [ "$NETCONF" = "OK" ]; then
+	chattr -i /etc/network/interfaces
+	cp /etc/network/interfaces /etc/network/interfaces.original
+	### STEP 2 - Ask if want to install bonded interfaces or single one, than configure as desired
+	## main ask dialog
+	$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL109" $HEIGHT $WIDTH
+	if [ "$?" = "0" ]; then
+		## Do Interface bonding
+		cat > /etc/network/interfaces << FOO
+# Static IP address
+auto bond0
+	iface bond0 inet static
+	slaves $INETDEVS
+	bond-mode balance-rr
+	bond-miimon 100
+	bond_downdelay 200
+	bond_updelay 200
+
+	address $NETWORK1.$NETWORK2.$NETWORK3.$NETWORK4/24
+	netmask $NETMASK0
+	network $NETWORK1.$NETWORK2.$NETWORK3.0
+	broadcast $BROADCAST0
+	gateway $GATEWAY0
+iface bond0 inet6 auto
+FOO
+		/etc/init.d/networking stop && /etc/init.d/networking start
+		echo "STEP2=networking & bonding auto set up" >> /var/log/sparky-ad-server.log
+		cat /etc/network/interfaces >> /var/log/sparky-ad-server.log
+	# check or change network settings
+	$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL112" $HEIGHT $WIDTH
+	if [ "$?" = "0" ]; then
+		nano /etc/network/interfaces
+		/etc/init.d/networking stop && /etc/init.d/networking start
+		echo "STEP2=networking & bonding manually fixed" >> /var/log/sparky-ad-server.log
+		cat /etc/network/interfaces >> /var/log/sparky-ad-server.log
+	else
+		if [ "$NETCONF" = "failed" ]; then
+			echo "STEP2=networking & bonding autoconfiguration failed so editing interfaces manually" >> /var/log/sparky-ad-server.log
+			nano /etc/network/interfaces
+			/etc/init.d/networking stop && /etc/init.d/networking start
+		fi
+	fi
+		echo "Bonding setup with more than one card or port" >> /var/log/sparky-ad-server.log
+		cat /etc/network/interfaces >> /var/log/sparky-ad-server.log
+else
+		## Single network card
+		cat > /etc/network/interfaces << FOO
+# Static IP address
+auto $INETDEV
+iface $INETDEV inet static
+	address $NETWORK1.$NETWORK2.$NETWORK3.$NETWORK4/24
+	netmask $NETMASK0
+	network $NETWORK1.$NETWORK2.$NETWORK3.0
+	broadcast $BROADCAST0
+	gateway $GATEWAY0
+iface $INETDEV inet6 auto
+FOO
+		/etc/init.d/networking stop && /etc/init.d/networking start
+		echo "STEP2=SINGLE networking auto set up" >> /var/log/sparky-ad-server.log
+		cat /etc/network/interfaces >> /var/log/sparky-ad-server.log
+		# check or change network settings
+		$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL112" $HEIGHT $WIDTH
+		if [ "$?" = "0" ]; then
+			nano /etc/network/interfaces
+			/etc/init.d/networking stop && /etc/init.d/networking start
+			echo "STEP2=SINGLE networking manually fixed" >> /var/log/sparky-ad-server.log
+			cat /etc/network/interfaces >> /var/log/sparky-ad-server.log
+		else
+			if [ "$NETCONF" = "failed" ]; then
+				echo "STEP2=SINGLE networking autoconfiguration failed so editing interfaces manually" >> /var/log/sparky-ad-server.log
+				nano /etc/network/interfaces
+				/etc/init.d/networking stop && /etc/init.d/networking start
+				cat /etc/network/interfaces >> /var/log/sparky-ad-server.log
+			fi
+		fi
+		echo "Single network card setup" >> /var/log/sparky-ad-server.log
+		cat /etc/network/interfaces >> /var/log/sparky-ad-server.log
+	fi
+else
+	# no eth devices found, set interfaces manually
+	$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL113 $LOCAL117" $HEIGHT $WIDTH
+	if [ "$?" = "0" ]; then
+		nano /etc/network/interfaces
+		/etc/init.d/networking stop && /etc/init.d/networking start
+		echo "STEP2=no eth devices found, set interfaces manually." >> /var/log/sparky-ad-server.log
+	else
+		echo "STEP2=no eth devices found, not set interfaces manually, exiting."
+		echo "STEP2=no eth devices found, not set interfaces manually, exiting." >> /var/log/sparky-ad-server.log
+		exit 1
+	fi
+fi
+# checking connection
+PINGTEST=$(ping -c 1 debian.org | grep [0-9])
+if [ "$PINGTEST" = "" ]; then
+	$DIALOG $TITLE"$TITLETEXT" $MSGBOX "$LOCAL1\n$LOCAL2\n\n$LOCAL3" $HEIGHT $WIDTH
+	echo "POST NETCONF PING TEST=Internet connection not active, please connect to install from internet" >> /var/log/sparky-ad-server.log
+	exit 1
+else
+	echo "POST NETCONF PING TEST=Internet connection OK"
+	echo "POST NETCONF PING TEST=Internet connection OK" >> /var/log/sparky-ad-server.log
+fi
+rm -f /tmp/ifconf0
+rm -f /tmp/netdevs.$$
+chattr +i /etc/network/interfaces
+service network-manager stop
+systemctl disable network-manager
+### end of bonding setup ###
+
+# Backup and edit sysctl to enable ipv4 fowarding
+chattr -i /etc/sysctl.conf
+cp /etc/sysctl.conf /etc/sysctl.conf.original
+sysctl -w net.ipv4.ip_forward=1
+sysctl -w net.ipv6.conf.all.forwarding=1
+# saving the setting for reboot time
+sed -i -e 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+sed -i -e 's/#net.ipv6.conf.all.forwarding=1/net.ipv6.conf.all.forwarding=1/g' /etc/sysctl.conf
+# lock changes into the config
+chattr +i /etc/sysctl.conf
+
+echo "2" >> /var/log/sparky-ad-steps.log
+menustep3
+}
+### end of step 2 ###
+
+### step 3: Pre samba configuration, backup and changes to hosts file #####################
+function menustep3 {
+
+# Ask for host name or use the default;
+FILEHOSTNAME=`cat /etc/hostname`
+if [ "$FILEHOSTNAME" = "live" ]; then
+	echo "This is Live enviroment! cannot continue, exiting."
+	echo "STEP3=This is Live enviroment! cannot continue, exiting." >> /var/log/sparky-ad-server.log
+	exit 1
+elif [ "$FILEHOSTNAME" != "" ]; then
+	$DIALOG $TITLE="$TITLETEXT" $YESNO "$LOCAL108\n\n$FILEHOSTNAME" $HEIGHT $WIDTH
+	if [ "$?" = "0" ]; then
+		MYHOSTNAME="$FILEHOSTNAME"
+	else
+		$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL108" $HEIGHT $WIDTH 2>/tmp/myhname.$$
+		MYHNAME1=`cat /tmp/myhname.$$`
+		if [ "$MYHNAME1" != "" ]; then
+			MYHOSTNAME="$MYHNAME1"
+		else
+			MYHOSTNAME="server"
+		fi
+	fi
+fi
+sed -i '1 c\'$MYHOSTNAME'' /etc/hostname
+hostname -b -F /etc/hostname
+rm -f /tmp/myhname.$$
+
+# Ask for domain name, use actual if any or use the default "sparky"
+if [ -f /tmp/detectdomain.$$ ]; then
+rm -f /tmp/detectdomain.$$
+fi
+domainname | awk -F. '{print $1}' >> /tmp/detectdomain.$$
+MYDNAME0=`cat /tmp/detectdomain.$$`
+if [ "$MYDNAME0" = "(none)" ]; then
+	$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL119\n$LOCAL120" $HEIGHT $WIDTH 2>/tmp/mydname.$$
+	MYDNAME1=`cat /tmp/mydname.$$`
+	if [ "$MYDNAME1" != "" ]; then
+			MYDOMAINNAME="$MYDNAME1"
+		else
+			MYDOMAINNAME="sparky"
+	fi
+else
+	$DIALOG $TITLE="$TITLETEXT" $YESNO "$LOCAL106\n\n$MYDNAME0" $HEIGHT $WIDTH
+	if [ "$?" = "0" ]; then
+		MYDOMAINNAME="$MYDNAME0"
+	else
+		$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL119\n$LOCAL120" $HEIGHT $WIDTH 2>/tmp/mydname.$$
+		MYDNAME1=`cat /tmp/mydname.$$`
+		if [ "$MYDNAME1" != "" ]; then
+			MYDOMAINNAME="$MYDNAME1"
+		else
+			MYDOMAINNAME="sparky"
+		fi
+	fi
+fi
+rm -f /tmp/detectdomain.$$
+rm -f /tmp/mydname.$$
+
+# Check actual TLD, ask for one if not found or use the default; 
+domainname | awk -F. '{print $2}' >>/tmp/detecttld.$$
+MYTLD=`cat /tmp/detecttld.$$`
+if [ "$MYTLD" != "" ]; then
+	$DIALOG $TITLE="$TITLETEXT" $YESNO "$LOCAL107\n\n$MYTLD" $HEIGHT $WIDTH
+	if [ "$?" = "0" ]; then
+		TLD="$MYTLD"
+	else
+		$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL107" $HEIGHT $WIDTH 2>/tmp/mytld.$$
+		MYTLD=`cat /tmp/mytld.$$`
+		if [ "$MYTLD" != "" ]; then
+			TLD="$MYTLD"
+		else
+			TLD="intranet"
+		fi
+	fi
+else
+	$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL107" $HEIGHT $WIDTH 2>/tmp/mytld.$$
+	MYTLD=`cat /tmp/mytld.$$`
+	if [ "$MYTLD" != "" ]; then
+		TLD="$MYTLD"
+	else
+		TLD="intranet"
+	fi
+fi
+rm -f /tmp/detecttld.$$
+rm -f /tmp/mytld.$$
+
+DOMAIN="$MYDOMAINNAME.$TLD"
+MYFQDN="$MYHOSTNAME.$MYDOMAINNAME.$TLD"
+domainname $DOMAIN
+
+# Lookup the current loopback IP Address and strip it out of the result
+LOADDR4=$(/sbin/ifconfig lo | grep 'inet '| cut -d: -f2 | awk '{ print $2}')
+LOADDR6=$(/sbin/ifconfig lo | grep 'inet6 ' | awk '{ print $2}')
+
+# Lookup the current IP Address and strip it out of the result
+IPADDR4=$(/sbin/ifconfig | grep 'inet '| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $2}')
+IPADDR6=$(/sbin/ifconfig | grep 'inet6 '| grep -v '::1' | awk '{ print $2}')
+
+# backup /etc/hosts and create a new one
+if [ -f /etc/hosts ]; then
+	chattr -i /etc/hosts
+	mv /etc/hosts /etc/hosts.original
+	touch /etc/hosts
+
+	#  Add the loopback IP Address
+	echo "$LOADDR4 localhost.localdomain localhost" >> /etc/hosts
+	echo "$LOADDR6 localhost.localdomain localhost ip6-localhost ip6-loopback" >> /etc/hosts
+	echo " " >> /etc/hosts
+	echo "fe00::0         ip6-localnet" >> /etc/hosts
+	echo "ff00::0         ip6-mcastprefix" >> /etc/hosts
+	echo "ff02::1		ip6-allnodes" >> /etc/hosts
+	echo "ff02::2		ip6-allrouters" >> /etc/hosts
+	echo " " >> /etc/hosts
+	#  Add the server's current IP Address and HostName to /etc/hosts
+	echo "$IPADDR4 $MYFQDN $MYHOSTNAME ${MYFQDN^^} ${MYHOSTNAME^^}" >> /etc/hosts
+	echo "$IPADDR6 $MYFQDN $MYHOSTNAME ${MYFQDN^^} ${MYHOSTNAME^^}" >> /etc/hosts
+	
+	
+	# Change the way resolvconf works and lock the file
+	chattr -i /etc/resolv.conf
+	mv /etc/resolv.conf /etc/resolv.conf.original
+	touch /etc/resolv.conf
+	echo "domain $DOMAIN" >> /etc/resolv.conf
+	echo "search $DOMAIN" >> /etc/resolv.conf
+	echo "nameserver $LOADDR4" >> /etc/resolv.conf
+	echo "nameserver $LOADDR6" >> /etc/resolv.conf
+else
+	echo "No hosts file found"
+	echo "STEP3=No hosts file found" >> /var/log/sparky-ad-server.log
+	exit 1
+fi
+
+# Lock changes on those files
+chattr +i /etc/hosts
+rm /etc/resolv.conf.tail
+chattr -i /etc/resolv.conf.tail
+cat /etc/resolv.conf >> /etc/resolv.conf.tail
+chattr +i /etc/resolv.conf
+chattr +i /etc/resolv.conf.tail
+
+echo "STEP3:" >> /var/log/sparky-ad-server.log
+echo "MYHOSTNAME=$MYHOSTNAME" >> /var/log/sparky-ad-server.log
+echo "MYDOMAINNAME=$MYDOMAINNAME" >> /var/log/sparky-ad-server.log
+echo "DOMAIN=$DOMAIN" >> /var/log/sparky-ad-server.log
+echo "MYFQDN=$MYHOSTNAME.$MYDOMAINNAME" >> /var/log/sparky-ad-server.log
+echo "ETC-HOSTS:" >> /var/log/sparky-ad-server.log
+cat /etc/hosts >> /var/log/sparky-ad-server.log
+echo "ETC-RESOLV.CONF:" >> /var/log/sparky-ad-server.log
+cat /etc/resolv.conf >> /var/log/sparky-ad-server.log
+
+echo "3" >> /var/log/sparky-ad-steps.log
+menustep4
+}
+### end of step 3 ###
+
+### step 4: samba ################################################################
+menustep4 ()
+{
+
+## Stop all samba related services
+systemctl stop smbd
+systemctl stop nmbd
+systemctl stop winbind
+systemctl stop samba
+systemctl stop samba-ad-dc
+systemctl disable smbd.service
+systemctl disable nmbd.service
+systemctl disable winbind.service
+systemctl disable samba.service
+
+# Backup actual Samba config file
+if [ -f /etc/samba/smb.conf ]; then
+	#chattr -i /etc/samba/smb.conf
+	mv /etc/samba/smb.conf /etc/samba/smb.conf.original
+fi
+
+# Backup actual samba install
+for f in /var/run/samba/*.tdb; do mv "$f" `echo "$f" | sed s/tdb/TDBoriginal/`; done
+for f in /var/run/samba/*.ldb; do mv "$f" `echo "$f" | sed s/ldb/LDBoriginal/`; done
+for f in /var/lib/samba/*.tdb; do mv "$f" `echo "$f" | sed s/tdb/TDBoriginal/`; done
+for f in /var/lib/samba/*.ldb; do mv "$f" `echo "$f" | sed s/ldb/LDBoriginal/`; done
+for f in /var/cache/samba*.tdb; do mv "$f" `echo "$f" | sed s/tdb/TDBoriginal/`; done
+for f in /var/cache/samba*.ldb; do mv "$f" `echo "$f" | sed s/ldb/LDBoriginal/`; done
+for f in /var/lib/samba/private*.tdb; do mv "$f" `echo "$f" | sed s/tdb/TDBoriginal/`; done
+for f in /var/lib/samba/private*.ldb; do mv "$f" `echo "$f" | sed s/ldb/LDBoriginal/`; done
+for f in /var/run/samba/*.tdb; do mv "$f" `echo "$f" | sed s/tdb/TDBoriginal/`; done
+for f in /var/run/samba/*.ldb; do mv "$f" `echo "$f" | sed s/ldb/LDBoriginal/`; done
+#
+# Backup Kerberos file
+if [ -f /etc/krb5.conf ]; then
+	chattr -i /etc/krb5.conf
+	mv /etc/krb5.conf /etc/krb5.conf.original
+	chattr +i /etc/krb5.conf.original
+fi
+
+# TO RESET EVERYTHING! Make this step now (implementantion) and in case of problems to RESET AND START OVER FROM 0
+rm -rfv /var/run/samba/*.tdb *.ldb
+rm -rfv /var/lib/samba/*.tdb *.ldb
+rm -rfv /var/cache/samba/*.tdb *.ldb
+rm -rfv /var/lib/samba/private/*.tdb *.ldb
+cp /var/lib/samba/private/krb5.conf /var/lib/samba/private/krb5.conf.original
+rm -fv /var/lib/samba/private/krb5.conf
+rm -fv /etc/samba/smb.conf
+
+# set site name
+$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL126\n$LOCAL127" $HEIGHT $WIDTH 2>/tmp/sitechoice.$$
+MYSITE=`cat /tmp/sitechoice.$$`
+if [ "$MYSITE" != "" ]; then
+	MYSITENAME="$MYSITE"
+else
+	MYSITENAME="Earth"
+fi
+rm -f /tmp/sitechoice.$$
+echo "MYSITENAME=$MYSITENAME" >> /var/log/sparky-ad-server.log
+
+# set dns
+$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL124\n$LOCAL125" $HEIGHT $WIDTH 2>/tmp/dnschoice.$$
+MYDNS=`cat /tmp/dnschoice.$$`
+if [ "$MYDNS" != "" ]; then
+	# must elaborate a dns resolv test so dns works after domain provision
+	MYDNS="$MYDNS"
+else
+	MYDNS="8.8.8.8 2001:4860:4860::8888"
+fi
+rm -f /tmp/dnschoice.$$
+echo "MYDNS=$MYDNS" >> /var/log/sparky-ad-server.log
+
+# samba root folder
+$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL130" $HEIGHT $WIDTH 2>/tmp/smbroot.$$
+ROOTSMB=`cat /tmp/smbroot.$$`
+if [ "$ROOTSMB" = "" ]; then
+	SMBROOT="sparkysmb"
+else
+	SMBROOT="$ROOTSMB"
+fi
+rm -f /tmp/smbroot.$$
+echo "SMBROOT=$SMBROOT" >> /var/log/sparky-ad-server.log
+rm -f /tmp/smbroot.$$
+
+# Create log folder and user home base directory
+echo "Creating /home/log/samba and /home/UserHomes directories..."
+if [ -d /home/$SMBROOT ]; then
+	echo "Folder already created before"
+else
+	mkdir -p /home/log/samba
+	mkdir -p /home/$SMBROOT
+	mkdir -p /home/ADBKP/precopy
+	mkdir -p /home/ADBKP/samba_backup
+	mkdir -p /home/$SMBROOT/UserFiles
+fi
+
+# Ajust ntp_signd (commented lines were changed to external file linkage)
+if [ -f /etc/ntp.conf ]; then
+	chattr -i /etc/ntp.conf
+	mv /etc/ntp.conf /etc/ntp.conf.original
+	chattr +i /etc/ntp.conf.orignal
+fi
+if [ -f /etc/sparky-ntp.conf ]; then
+	chattr -i /etc/ntp.conf
+	mv /etc/ntp.conf /etc/ntp.conf.original
+	ln -s /etc/sparky-ntp.conf /etc/ntp.conf
+	chattr +i /etc/ntp.conf
+fi
+
+# set samba password
+SMBPASS="1"
+SMBPASS2="2"
+
+while [ "$SMBPASS" != "$SMBPASS2" ]; do
+	$DIALOG $TITLE"$TITLETEXT" $PASSWORD "$LOCAL121" $HEIGHT $WIDTH 2>/tmp/smbpass.$$
+	if [ "$?" = "0" ]; then
+		SMBPASS=`cat /tmp/smbpass.$$`
+	else
+		exit 1
+	fi
+	rm /tmp/smbpass.$$
+	$DIALOG $TITLE"$TITLETEXT" $PASSWORD "$LOCAL122" $HEIGHT $WIDTH 2>/tmp/smbpass.$$
+	if [ "$?" = "0" ]; then
+		SMBPASS2=`cat /tmp/smbpass.$$`
+	else
+		exit 1
+	fi
+	rm /tmp/smbpass.$$
+	if [ "$SMBPASS" != "$SMBPASS2" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MSGBOX "$LOCAL123" $HEIGHT $WIDTH
+	fi
+	rm /tmp/smbpass.$$
+done
+
+rm /etc/profile.d/sambaldb.sh
+cat > /etc/profile.d/sambaldb.sh << FOO
+export LDB_MODULES_PATH="${LDB_MODULES_PATH}:/usr/lib/samba/ldb"
+FOO
+chmod 0755 /etc/profile.d/sambaldb.sh
+. /etc/profile.d/sambaldb.sh
+
+# Do the provision
+IPADDR4=$(/sbin/ifconfig | grep 'inet '| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $2}')
+IPADDR6=$(/sbin/ifconfig | grep 'inet6 '| grep -v '::1' | awk '{ print $2}')
+samba-tool domain provision --realm=$DOMAIN --domain=${MYDOMAINNAME^^} --host-name=$MYHOSTNAME --host-ip=$IPADDR4 --site=$MYSITENAME --dns-backend=SAMBA_INTERNAL --adminpass=$SMBPASS --server-role=dc --function-level=2008_R2 --use-rfc2307 --use-xattr=yes --option="netbios name=${MYHOSTNAME^^}" --option="dns forwarder=$MYDNS" --option="server string=%h SparkyLinux Server Host" --option="winbind nss info=rfc2307" --option="winbind use default domain=Yes" --option="winbind enum users=yes" --option="winbind enum groups=yes" --option="log level=1" --option="log file = /home/log/samba/%m.log" --option="max log size=100000" --option="access based share enum=Yes" --option="hide unreadable=yes" --option="hide unwriteable files=no" --option="template homedir=/home/$SMBROOT/UserFiles/%U" --option="template shell=/bin/bash" --option="map acl inherit=yes" --option="acl group control=yes" --option="store dos attributes=Yes" --option="vfs objects=acl_xattr" --option="wins support=yes" --option="max wins ttl=518400" --option="local master=yes" --option="add user script=/usr/sbin/useradd -m '%u'" --option="delete user script=/usr/sbin/userdel -r '%u'" --option="add machine script=/usr/sbin/useradd -s /bin/false/ -d /var/lib/nobody %u" --option="add group script=/usr/sbin/groupadd %g" --option="delete group script=/usr/sbin/groupdel %g" --option="add user to group script=/usr/sbin/usermod -G %g %u" --option="passwd program=/usr/bin/passwd %u" --option="tls enabled=yes" --option="tls keyfile=tls/key.pem" --option="tls certfile=tls/cert.pem" --option="tls cafile=tls/ca.pem" --option="logon script=netlogon.bat" --option="allow dns updates=nonsecure and secure" --option="server signing=auto" --option="client signing=auto" --option="idmap_ldb : use rfc2307=yes" --option="idmap config * : backend=tdb" --option="idmap config * : range=1000000-1999999" --option="idmap config * : schema_mode=rfc2307" --option="idmap config ${DOMAIN^^} : backend=ad" --option="idmap config ${DOMAIN^^} : range=1000-999999" --option="time server=yes" --option="domain logons=Yes" --option="domain master=yes"
+
+# finish ntp configuration after samba created libs
+chown root:ntp /var/lib/samba/ntp_signd/
+chgrp ntp /var/lib/samba/ntp_signd
+chmod -R 0750 /var/lib/samba/ntp_signd/
+
+#Linking samba generated kerberos file to systemwide
+ln -sf /var/lib/samba/private/krb5.conf /etc/krb5.conf
+chattr +i /etc/krb5.conf
+
+### Steps commented are intented to client version
+# Link libnss and reload
+if [ "$ARCH64" != "" ]; then
+	ln -s /lib/x86_64-linux-gnu/libnss_winbind.so.2 /lib/x86_64-linux-gnu/libnss_winbind.so
+elif [ "$ARCH32" != "" ]; then
+	ln -s /lib/i386-linux-gnu/libnss_winbind.so.2 /lib/i386-linux-gnu/libnss_winbind.so
+else
+	echo "your arch not supported... exiting..."
+	exit 1
+fi
+ldconfig
+# Enable AD users to logon
+# Enable AD Users and Groups avaliable locally
+sed -i '27 c\password        [success=2 default=ignore]      pam_winbind.so try_first_pass' /etc/pam.d/common-account
+
+mv /etc/nsswitch.conf /etc/nsswitch.conf.original
+touch /etc/nsswitch.conf
+cat > /etc/nsswitch.conf << FOO
+# /etc/nsswitch.conf
+#
+# Samba GNU Name Service Switch functionality integration
+
+passwd:         compat winbind
+group:          compat winbind
+shadow:         compat
+gshadow:        files
+
+hosts:  files wins mdns4_minimal dns [NOTFOUND=return]
+networks:       files
+
+protocols:      db files
+services:       db files
+ethers:         db files
+rpc:            db files
+
+netgroup:       nis
+FOO
+cat > /etc/security/pam_winbind.conf << FOO
+[global]
+  debug = no
+  debug_state = no
+  try_first_pass = yes
+  krb5_auth = yes
+  krb5_ccache_type = FILE
+  cached_login = yes
+  silent = no
+  mkhomedir = yes
+FOO
+
+# Add domain admins to sudoers
+UPDOMAIN="${MYDOMAINNAME^^}"
+echo "%$UPDOMAIN\\domain\ admins ALL=(ALL:ALL) ALL" | tee -a /etc/sudoers
+echo "Set group_source dynamic" >> /etc/sudo.conf
+
+# configure sysvol and netlogon to be hidden at /etc/samba/smb.conf
+sed -i "/sysvol/d" /etc/samba/smb.conf
+sed -i "/read only/d" /etc/samba/smb.conf
+sed -i "/netlogon/d" /etc/samba/smb.conf
+echo "[netlogon]" | tee -a /etc/samba/smb.conf
+echo "        comment = Domain Logon Service" | tee -a /etc/samba/smb.conf
+echo "        path = /var/lib/samba/sysvol/$DOMAIN/scripts" | tee -a /etc/samba/smb.conf
+echo "        valid users = %U" | tee -a /etc/samba/smb.conf
+echo "        admin users = Administrator" | tee -a /etc/samba/smb.conf
+echo "        read only = No" | tee -a /etc/samba/smb.conf
+echo "        browseable = No" | tee -a /etc/samba/smb.conf
+echo "        write list =@admins" | tee -a /etc/samba/smb.conf
+echo "        guest ok = Yes" | tee -a /etc/samba/smb.conf
+echo "        locking = no" | tee -a /etc/samba/smb.conf
+echo " " | tee -a /etc/samba/smb.conf
+echo "[sysvol]" | tee -a /etc/samba/smb.conf
+echo "        path = /var/lib/samba/sysvol" | tee -a /etc/samba/smb.conf
+echo "        read only = No" | tee -a /etc/samba/smb.conf
+echo "        browseable = No" | tee -a /etc/samba/smb.conf
+# Add home directories, default share and enable auto creation of user directories uppon logon using /etc/skel model
+echo " " | tee -a /etc/samba/smb.conf
+echo "[homes]" | tee -a /etc/samba/smb.conf
+echo "		  root preexec = mkdir -p -m 0700 /home/$SMBROOT/UserFiles/%U && chown %U:"Domain Admins" /home/$SMBROOT/UserFiles/%U"
+echo "        comment = User Folder on Server" | tee -a /etc/samba/smb.conf
+echo "        path = /home/$SMBROOT/UserFiles/%U" | tee -a /etc/samba/smb.conf
+echo "        read only - No" | tee -a /etc/samba/smb.conf
+echo "        writeable = Yes" | tee -a /etc/samba/smb.conf
+echo "        browsable = No" | tee -a /etc/samba/smb.conf
+echo "        create mode = 0750" | tee -a /etc/samba/smb.conf
+echo " " | tee -a /etc/samba/smb.conf
+echo "[${SMBROOT^^}]" | tee -a /etc/samba/smb.conf
+echo "        path = /home/$SMBROOT" | tee -a /etc/samba/smb.conf
+echo "        read only - No" | tee -a /etc/samba/smb.conf
+echo "        writeable = Yes" | tee -a /etc/samba/smb.conf
+echo "        write list = @users" | tee -a /etc/samba/smb.conf
+echo "        browsable = Yes" | tee -a /etc/samba/smb.conf
+
+# Create netlogon.bat script to auto create user folder on server if not present
+UPHN=${MYHOSTNAME^^}
+UPSMBROOT=${SMBROOT^^}
+cat > /var/lib/samba/sysvol/$DOMAIN/scripts/netlogon.bat << FOO
+@echo off
+setlocal EnableDelayedExpansion
+net time \\\\$UPHN /set /yes
+if not exist "\\\\$UPHN\\$UPSMBROOT\UserFiles\%USERNAME%" (
+  mkdir "\\\\$UPHN\\$UPSMBROOT\UserFiles\%USERNAME%"
+  if "!errorlevel!" EQU "0" (
+    echo Folder created successfully
+  ) else (
+    echo Error while creating folder
+  )
+) else (
+  echo Folder already exists
+)
+net use X: \\\\$UPHN\\$UPSMBROOT\%USERNAME%
+exit
+FOO
+todos /var/lib/samba/sysvol/$DOMAIN/scripts/netlogon.bat
+
+# Link backup script to cron weekly
+SMBKP=$(ls /etc/cron.weekly/sparky-ad-sambabkp  >> /dev/null 2>&1 && echo yes || echo no)
+if [ "$SMBKP" = "yes" ]; then
+	echo "backupscript already installed" >> /var/log/sparky-ad-server.log
+elif [ "$SMBKP" = "no" ]; then
+	echo "backupscript installed" >> /var/log/sparky-ad-server.log
+	ln -s /usr/bin/sparky-ad-sambabkp /etc/cron.weekly
+fi
+
+# Reload Samba config, enable and start all samba ad dc related services and reload all config before making it
+smbcontrol all reload-config
+systemctl daemon-reload
+systemctl unmask samba-ad-dc.service
+systemctl start samba-ad-dc.service
+install -d /var/lib/samba/ntp_signd
+systemctl enable samba-ad-dc.service
+ntpdate -dquv 0.pool.ntp.org
+service ntp start
+hwclock --systohc
+systemctl enable ntp.service
+
+## Verify all services
+echo "===== VERIFY SETUP ======" >> /var/log/sparky-ad-server.log
+netstat –tulpn | egrep "smbd|samba|ntp" >> /var/log/sparky-ad-server.log
+ps ax | egrep "samba|smbd|nmbd|winbindd|ntp" >> /var/log/sparky-ad-server.log
+
+## Verify domain records and basic services
+echo "===== DOMAIN LEVEL TEST ======" >> /var/log/sparky-ad-server.log
+samba-tool domain level show >> /var/log/sparky-ad-server.log
+host -t SRV _ldap._tcp.$MYDOMAINNAME. >> /var/log/sparky-ad-server.log
+host -t SRV _kerberos._udp.$MYDOMAINNAME. >> /var/log/sparky-ad-server.log
+host -t A $MYFQDN. >> /var/log/sparky-ad-server.log
+klist >> /var/log/sparky-ad-server.log
+smbclient //$MYHOSTNAME/netlogon -U Administrator -c 'ls' $SMBPASS >> /var/log/sparky-ad-server.log
+echo "===== ---------------- ======" >> /var/log/sparky-ad-server.log
+
+# Important step to grant network file service and ajust shared home folders permissions
+echo "Adding Administrator to sudo group"
+usermod -aG sudo $UPDOMAIN\\administrator
+echo "Grant Administrator disk operator status"
+net rpc rights grant "$UPDOMAIN\domain admins" SeDiskOperatorPrivilege -U "$UPDOMAIN\administrator"%$SMBPASS
+echo "Ajust permissions"
+chown root:"Domain Admins" /var/lib/samba/sysvol/$DOMAIN/scripts
+chmod 0775 /var/lib/samba/sysvol/$DOMAIN/scripts
+chown -R root:"Domain Admins" /home/$SMBROOT
+chmod -R ug+rw /home/$SMBROOT
+chown -R root:"Domain Users" /home/$SMBROOT/UserFiles
+chmod -R ug+rw /home/$SMBROOT/UserFiles
+setfacl -d -m g:domain\ admins:rwx  /var/lib/samba/sysvol/$DOMAIN/scripts
+setfacl -d -m g:domain\ users:rw  /var/lib/samba/sysvol/$DOMAIN/scripts
+setfacl -d -m g:domain\ admins:rwx /home/$SMBROOT
+setfacl -d -m g:domain\ users:rw /home/$SMBROOT
+setfacl -d -m g:domain\ users:rwx /home/$SMBROOT/UserFiles
+
+# Reverse lookup zone creation
+# Discover final ip zone
+NETWORK1=`ifconfig | grep inet | head -n1 | cut -f2 -d":" | awk '{print $2}' | cut -f1 -d"."`
+NETWORK2=`ifconfig | grep inet | head -n1 | cut -f2 -d":" | awk '{print $2}' | cut -f2 -d"."`
+NETWORK3=`ifconfig | grep inet | head -n1 | cut -f2 -d":" | awk '{print $2}' | cut -f3 -d"."`
+NETWORK4=`ifconfig | grep inet | head -n1 | cut -f2 -d":" | awk '{print $2}' | cut -f4 -d"."`
+NETADD=$NETWORK1.$NETWORK2.$NETWORK3.$NETWORK4
+
+echo "Adding reverse lookup zone to server"
+samba-tool dns zonecreate $MYFQDN $NETWORK3.$NETWORK2.$NETWORK1.in-addr.arpa -U Administrator --password=$SMBPASS
+#samba-tool dns add $MYHOSTNAME $MYDOMAINNAME $MYHOSTNAME A $NETADD -U Administrator --password=$SMBPASS
+samba-tool dns add $MYFQDN $NETWORK3.$NETWORK2.$NETWORK1.in-addr.arpa $NETWORK4 PTR $MYTLD -U Administrator --password=$SMBPASS
+#samba_dnsupdate --use-file=/var/lib/samba/private/dns.keytab --verbose --all-names
+host -t PTR $NETADD
+
+# shared folders
+# ask if want to share other than deafault home share
+$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL128" $HEIGHT $WIDTH 
+if [ "$?" = "0" ]; then
+	
+	# ask if want to share existant or new folder
+	$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL140" $HEIGHT $WIDTH 
+	if [ "$?" = "0" ]; then
+		# select an already existant folder to share
+		$DIALOG $BACKTITLE"$LOCAL129" $TITLE"$TITLETEXT" $DSELECT / $HEIGHT2 $WIDTH2 2>/tmp/sharedir.$$
+		DIRSELECT=`cat /tmp/sharedir.$$`
+	else
+		# enter a name or use default
+		$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL135" $HEIGHT2 $WIDTH2 2>/tmp/namedir.$$
+		DIRNAME=`cat /tmp/namedir.$$`
+		if [ "$DIRNAME" != "" ]; then
+			DIRNAME=$DIRNAME
+		else
+			DIRNAME="sparkydir.$$"
+		fi
+	fi
+	# check smbroot folder location and empty share location than create the share
+	if [ "$DIRSELECT" = "$SMBROOT" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MSGBOX "$LOCAL132" $HEIGHT $WIDTH
+		echo "share yes" >> /tmp/dirshare.$$
+	elif [ "$DIRSELECT" = "" ]; then
+		$DIALOG $TITLE"$TITLETEXT" $MSGBOX "$LOCAL133" $HEIGHT $WIDTH
+		echo "share yes" >> /tmp/dirshare.$$
+	elif [ "$DIRSELECT" != "" ]; then
+		if [ ! -d "$DIRSELECT" ]; then
+			mkdir -p $DIRSELECT
+		fi
+	fi
+	# changes to be apllied any dir (existant or non)
+	chown root:"Domain Admins" $DIRSELECT
+	chmod 2775 $DIRSELECT
+	setfacl -d -m g:domain\ admins:rwX $DIRSELECT
+	setfacl -d -m g:domain\ users:rw $DIRSELECT
+	echo " " >> /etc/samba/smb.conf
+	echo "[$DIRNAME]" >> /etc/samba/smb.conf
+	echo "	path = $DIRSELECT" >> /etc/samba/smb.conf
+	echo "	read only = No" >> /etc/samba/smb.conf
+	# lock config file
+	# chattr +i /etc/samba/smb.conf
+	echo "share yes" >> /tmp/dirshare.$$
+	echo "SHARED DIRA=$DIRSELECT" >> /var/log/sparky-ad-server.log
+	echo "SHARED NAMEA=$DIRNAME" >> /var/log/sparky-ad-server.log
+
+	# more shared folders
+	CHECKSHARE0=`cat /tmp/dirshare.$$ | grep yes`
+	rm -f /tmp/dirshare.$$
+	if [ "$CHECKSHARE0" != "" ]; then
+		while [ "$CHECKSHARE" != "" ]; do
+			# ask if want to share more folders
+			$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL134" $HEIGHT $WIDTH
+			if [ "$?" = "0" ]; then
+				# ask if want to share existant or new folder
+				$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL140" $HEIGHT $WIDTH 
+				if [ "$?" = "0" ]; then
+					# select an already existant folder to share
+					$DIALOG $BACKTITLE"$LOCAL129" $TITLE"$TITLETEXT" $DSELECT / $HEIGHT2 $WIDTH2 2>/tmp/sharedir.$$
+					DIRSELECT=`cat /tmp/sharedir.$$`
+				else
+					# enter a name or use default
+					$DIALOG $TITLE"$TITLETEXT" $ENTRY "$LOCAL135" $HEIGHT2 $WIDTH2 2>/tmp/namedir.$$
+					DIRNAME=`cat /tmp/namedir.$$`
+				fi
+				if [ "$DIRSELECT" = "$SMBROOT" ]; then
+					$DIALOG $TITLE"$TITLETEXT" $MSGBOX "$LOCAL132" $HEIGHT $WIDTH
+					echo "share yes" >> /tmp/dirshare.$$
+				elif [ "$DIRSELECT" = "" ]; then
+					$DIALOG $TITLE"$TITLETEXT" $MSGBOX "$LOCAL133" $HEIGHT $WIDTH
+					echo "share yes" >> /tmp/dirshare.$$
+				elif [ "$DIRSELECT" != "" ]; then
+					if [ ! -d "$DIRSELECT" ]; then
+						mkdir -p $DIRSELECT
+					fi
+				fi
+				# changes to be apllied any dir (existant or non)
+				chown root:"Domain Admins" $DIRSELECT
+				chmod 2775 $DIRSELECT
+				setfacl -d -m g:domain\ admins:rwX $DIRSELECT
+				setfacl -d -m g:domain\ users:rw $DIRSELECT
+				echo "[$DIRNAME]" >> /etc/samba/smb.conf
+				echo "	path = $DIRSELECT" >> /etc/samba/smb.conf
+				echo "	read only = No" >> /etc/samba/smb.conf
+				echo "" >> /etc/samba/smb.conf
+				echo "share yes" >> /tmp/dirshare.$$
+				echo "SHARED DIRB=$DIRSELECT" >> /var/log/sparky-ad-server.log
+				echo "SHARED NAMEB=$DIRNAME" >> /var/log/sparky-ad-server.log
+			else
+				echo "" >> /tmp/dirshare.$$
+				echo "SHARED DIRB=" >> /var/log/sparky-ad-server.log
+				echo "SHARED NAMEB=" >> /var/log/sparky-ad-server.log
+			fi
+			CHECKSHARE=`cat /tmp/dirshare.$$`
+			rm /tmp/dirshare.$$
+		done
+		rm /tmp/dirshare.$$
+	else
+		echo "no more second shares"
+	fi
+else
+	rm /tmp/dirshare.$$
+	echo "No more shares other than default" >> /var/log/sparky-ad-server.log
+fi
+smbcontrol all reload-config
+
+## commented postmail configuration
+#postconf -e "myorigin = $MYDOMAINNAME"
+#postconf -e "myhostname=$MYFQDN"
+
+echo "STEP4=finished..." >> /var/log/sparky-ad-server.log
+
+echo "4" >> /var/log/sparky-ad-steps.log
+menustep5
+}
+### end of step 4 ###
+
+### step 5: clamav #################################################################
+menustep5 ()
+{
+
+## install clamav, if desired ##
+# question the install nedded
+$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL137" $HEIGHT $WIDTH
+if [ "$?" = "0" ]; then
+	apt-get install cabextract clamav clamav-base clamav-daemon clamav-freshclam clamdscan clamfs clamav-milter clamav-testfiles clamav-unofficial-sigs libc-icap-mod-clamav python-pyclamav libclamav-client-perl whois logwatch libc-icap-mod-clamav libclamunrar7 python-pyclamav libclamav-client-perl p7zip unzip unrar -y
+	killall freshclam clamav-unofficial-sigs
+	clamav-unofficial-sigs
+	freshclam
+	service clamav-daemon restart
+	service clamav-freshclam restart
+	echo "STEP5=ClamAv installed" >> /var/log/sparky-ad-server.log
+else
+	echo "STEP5=ClamAv not installed" >> /var/log/sparky-ad-server.log
+fi
+
+echo "5" >> /var/log/sparky-ad-steps.log
+menustep6
+}
+### end of step 5 ###
+
+### step 6: enable UPS support ####################################################
+menustep6 ()
+{
+
+# enable support to UPS via nut
+$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL111" $HEIGHT $WIDTH
+if [ "$?" = "0" ]; then
+	apt-get install nut nut-client -y
+	systemctl enable nut-monitor.service
+	echo "UPS support installed"
+	echo "STEP6=UPS support installed" >> /var/log/sparky-ad-server.log
+else
+	systemctl disable nut-monitor.service
+	echo "UPS support not installed"
+	echo "STEP6=UPS support not installed" >> /var/log/sparky-ad-server.log
+fi
+
+echo "6" >> /var/log/sparky-ad-steps.log
+menustep7
+}
+### end of step 6 ###
+
+### step 7: netdata ##############################################################
+menustep7 ()
+{
+
+## install netdata, if desired ##
+# question the install nedded
+$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL138" $HEIGHT $WIDTH
+if [ "$?" = "0" ]; then
+	apt-get install fonts-font-awesome fping freeipmi-common libfreeipmi17 libipmimonitoring6 libjs-bootstrap netdata netdata-data -y
+	echo "STEP7=netdata monitoring installed" >> /var/log/sparky-ad-server.log
+else
+	echo "STEP7=netdata monitoring not installed" >> /var/log/sparky-ad-server.log
+fi
+
+echo "7" >> /var/log/sparky-ad-steps.log
+menustep8
+}
+### end of step 7 ###
+
+### step 8: webmin ####################################################################
+menustep8 ()
+{
+
+## install webmin, if desired ##
+# question the install nedded
+$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL139" $HEIGHT $WIDTH
+if [ "$?" = "0" ]; then
+	apt-get install strongswan-starter webmin libauthen-libwrap-perl -y
+	echo "STEP8=WebMin manager installed" >> /var/log/sparky-ad-server.log
+else
+	echo "STEP8=WebMin manager not installed" >> /var/log/sparky-ad-server.log
+fi
+
+echo "8" >> /var/log/sparky-ad-steps.log
+menustep9
+}
+### end of step 8 ###
+
+### step 9: install beep support via sparky-beep #####################################
+menustep9 ()
+{
+
+$DIALOG $TITLE"$TITLETEXT" $YESNO "$LOCAL118" $HEIGHT $WIDTH
+if [ "$?" = "0" ]; then
+	apt-get install sparky-beep -y
+	echo "STEP9=Beep support installed"
+	echo "STEP9=Beep support installed" >> /var/log/sparky-ad-server.log
+else
+	echo "STEP9=Beep support not installed"
+	echo "STEP9=Beep support not installed" >> /var/log/sparky-ad-server.log
+fi
+
+echo "9" >> /var/log/sparky-ad-steps.log
+
+echo "End of AD Server Installer log" >> /var/log/sparky-ad-server.log
+echo "==============================================================" >> /var/log/sparky-ad-server.log
+exit 1
+}
+### end of step 9 ###
+
+mainmenu
+menustep1
+menustep2
+menustep3
+menustep4
+menustep5
+menustep6
+menustep7
+menustep8
+menustep9

@@ -1,0 +1,57 @@
+#  Fichier de localisation française de Sparky AD Server.
+# Copyright 2016 hiver <hiver@club-internet.fr> 2018/11/12
+# Sous licence GNU GPL v2
+# Dernière mise à jour 2018/11/12
+# Last update 2019/03/17 by pavroo
+#
+# INFO FOR TRANSLATORS : When you find "\n" means a breakline into the dialog box, so text appear next line
+#                           If you feel the text will look better "cutted" here or there for your language
+#                           This can be used or changed from the original place. Thanks!
+#
+LOCAL1="Le test de connexion à internet a échoué!"
+LOCAL2="L'installation en ligne de l'application ne peut être faite!"
+LOCAL3="Sortie à présent..."
+LOCAL4="La configuration du serveur est ciblé exclusivement sur la version stable de Debian/Sparky."
+LOCAL5="This is Sparky Active Directory (AD) post-install script which will install and set all you need to run AD simple file Server."
+LOCAL6="Continue?"
+LOCAL7="Sparky AD Server Installer"
+LOCAL8="You haven't finished Sparky AD Server configuration before.\nWould you like to continue configuration from the point you stopped or start from the beginning?"
+LOCAL9="Start from the beginning"
+LOCAL10="Continue from point install stopped before"
+LOCAL11="You finished Sparky AD Server configuration already.\nWould you like to start it again from the beginning? \n (WARNING THIS WILL ERASE ANY CONFIGURATION PREVIOUSLY DONE!!)"
+#
+LOCAL106="Would you like to use the already configured domain name?"
+LOCAL107="Enter the desired TLD name, use an invalid one other than .local or .internal;  \n15 characters maximum,  no spaces or special characters;\nhint: host.lan.>> intranet << ; If you do not enter any name, the default name intranet will be used."
+LOCAL108="Enter the desired server name;\nThis will be this machine name on network; \n15 characters maximum, no spaces or special characters; \nhint: >> host <<.lan.intranet ; If you do not enter any name, the default name server will be used."
+LOCAL109="Y a-t-il plus d'une carte réseau ou port à relier?"
+LOCAL110="Ce paquet n'est pas disponible pour la version de votre système."
+LOCAL111="Voulez-vous installer le support pour un onduleur (UPS)?"
+LOCAL112="Voulez-vous vérifier les paramètres du réseau et/ou les configurer manuellement?"
+LOCAL113="Ne peut trouver l'interface du périphérique réseau,"
+LOCAL114="vous devez la configurer manuellement."
+LOCAL115="Le résultat de la configuration du réseau est la suivante, l'utiliser telle quelle ou stopper l'installation."
+LOCAL116="Entrer le nom ou les noms de vos périphériques réseau, si vous voulez en relier plus d'un; séparés par des espaces!"
+LOCAL117="Vous devez configurer le réseau manuellement!"
+LOCAL118="Voulez-vous installer les bips d'alerte?"
+LOCAL119="Enter the desired domain name. \nThis is where the name of the company is usualy inserted. \n15 characters maximum, no spaces, dots or special characters.; hint: host.>> lan <<.intranet"
+LOCAL120="Si vous n'entrer pas de nom, sparky sera utilisé par défaut"
+LOCAL121="Entrer le mot de passe de l'administrateur par défaut de Samba, s'il vous plaît suivez les standards de complexité de mots de passe de Microsoft."
+LOCAL122="Entrer à nouveau le mot de passe de l'administrateur par défaut de Samba."
+LOCAL123="Les mots de passe ne correspondent pas. Essayez à nouveau."
+LOCAL124="Entrer au moins un serveur DNS pour assurer la résolution des nom en dehors du domaine; séparés par des espaces s'il y en a plusieurs (paramétrer cela dans votre firewall, passerelle ou google 8.8.8.8)."
+LOCAL125="Si vous n'entrer aucun DNS, le 8.8.8.8 2001:4860:4860::8888 (google) sera utilisé par défaut"
+LOCAL126="Entrer le nom désiré pour le site (pas de caractères spéciaux); astuce: cela peut être un nom de ville."
+LOCAL127="Si vous n'entrer aucun nom de site, Earth sera utilisé par défaut."
+LOCAL128="Voulez-vous partager un répertoire sur le serveur?\nLe prochain écran vous permettra de configurer le chemin du répertoire partagé. Tous les répertoires et sous-répertoire seront créés s'ils n'existent pas.\nN'utilisez pas le nom de l'administrateur Samba créé plus tôt."
+LOCAL129="Entrer le chemin du répertoire partagé dans la fenêtre du bas."
+LOCAL130="Entrer le nom de l'administrateur Samba qui sera créé dans le répertoire home. Il doit différer du nom des autres utilisateurs du système. Sinon, sparkysmb sera utilisé."
+LOCAL131="le nom de l'administrateur Samba est le même qu'un des utilisateurs du système, essayez à nouveau."
+LOCAL132="le répertoire partagé contient le nom de l'administrateur Samba et donc ne peut être utilisé!"
+LOCAL133="Le nom du répertoire partagé est vide, essayez à nouveau."
+LOCAL134="Voulez-vous partager un autre répertoire sur le serveur?\nLe prochain écran vous permettra de configurer le chemin du répertoire partagé. Tous les répertoires et sous-répertoire seront créés s'ils n'existent pas.\nN'utilisez pas le nom de l'administrateur Samba créé plus tôt ni d'un répertoire déjà partagé."
+LOCAL135="Entrer le nom du répertoire partagé. Si vous n'en entrez aucun, un sparkydir.XXXX sera utilisé par défaut."
+LOCAL136="Les paquets requis pour le serveur demandé n'ont pas été installés!"
+LOCAL137="Would you like to install and update Clamav antivirus? \n(recommended, but not required)"
+LOCAL138="Would you like to install netdata monitoring interface? \n(recommended but not required)"
+LOCAL139="Would you like to install webmin management interface? \n(recommended as default management interface, only say no if you know what you're doing.)"
+LOCAL140="Select yes to select an existant folder or no to create a new one"

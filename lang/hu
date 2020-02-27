@@ -1,0 +1,52 @@
+# Hungarian localization file for Sparky Backup Server. (Translated by Nemomen).
+# Copyright 2018 Paweł "pavroo" Pijanowski <pavroo@onet.eu> 2018/09/26
+# Under the GNU GPL v2
+# Last update 2019/03/17 by pavroo
+LOCAL1="Az Internet kapcsolat tesztje hibás!"
+LOCAL2="A kiszolgáló alkalmazás on-line telepítése NEM készült el!"
+LOCAL3="Kilépés most..."
+LOCAL4="A kiszolgálókonfiguráció csak a Debian/Sparky stabil kiadását (stable line) célozza.”
+LOCAL5="Ez a Sparky Aktív Könyvtár (Sparky Active Directory) (AD) utólagos telepítő parancsfájl, amelyik telepíteni és beállítani fogja mindazt, amire szüksége lesz az AD egyszerű fájlkiszolgáló futtatásához.”
+LOCAL6="Folytatja?"
+LOCAL7="Sparky Aktív Könyvtár (AD) Kiszolgáló Telepítő [Sparky AD Server Installer]"
+LOCAL8="Ön nem fejezte be megelőzően a  Sparky Aktív Könyvtár (AD) Kiszolgáló Telepítő [Sparky AD Server] beállítását (konfigurálását)\nKívánja onnan folytatni, ahol leállította vagy kezdi az elejétől?
+LOCAL9="Kezdés az elejétől"
+LOCAL10="Folytatás onnan, ahol korábban leállította”
+LOCAL11="Ön már befejezte a Sparky Aktív Könyvtár (AD) Kiszolgáló [Sparky AD Server] beállítását (konfigurálását)\nSzeretné ismét az elejétől indítani? \n(VIGYÁZAT EZ MINDEN KORÁBBI BEÁLLÍTÁST TÖRÖLNI FOG!!=[WARNING THIS WILL ERASE ANY CONFIGURATION PREVIOUSLY DONE!]"
+#
+LOCAL106="Kívánja a már beállított tartománynevet használni?"
+LOCAL107="Írja be az óhajtott TLD (legfelső szintű tartomány) nevet, használjon egy érvénytelen másikat, mint a helyi vagy belső (tartomány név) \nmaximum 15 karakter, üres térközök, pontok vagy különleges karakterek nélkül; \nhint: host.lan.>> intranet << ; Ha nem ír be semmiféle nevet, az alapértelmezett intranet neve kerül használásra."
+LOCAL108="Írja be az óhajtott/kívánt kiszolgáló nevet!Ez lesz ennek a gépnek a hálózaton a (gép)neve; \nmaximum 15 karakter, üres térközök, pontok vagy különleges karakterek nélkül; \nhint: >> host<< lan.intranet << ; Ha nem ír be semmiféle nevet, az alapértelmezett kiszolgáló (szerver) neve kerül használásra."
+LOCAL109="Egynél több hálókártya vagy port kötegelendő?”
+LOCAL110="Ez a csomag nem érhető el az Ön rendszere változatához.”
+LOCAL111="Kívánja telepíteni a szünetmentes áramforrás (UPS,No-Break) támogatást?”
+LOCAL112="Akarja ellenőrizni az automatikusan javított aktuális hálózati beállításokat és/vagy kézzel beállítani?”
+LOCAL113="NEM található hálózati eszköz felület”
+LOCAL114="Önnek KELL azt kézzel beállítani."
+LOCAL115="A hálózati beállítás a következő lesz, hagyja így vagy állítsa le a telepítést!
+LOCAL116="Írja be hálózati eszközei nevét vagy neveit, ha egynél többet kíván kötegelni; hellyel/területtel!”
+LOCAL117="Önnek KELL kézzel beállítania a hálózatot!"
+LOCAL118="Kívánja telepíteni a sparky-beep szerviz figyelmeztető számítógép-hangot?”
+LOCAL119="Írja be az óhajtott/kívánt kiszolgáló nevet! \nEz az, ahová általában a cégnevet szokták beilleszteni. \nmaximum 15 karakter, üres térközök, pontok vagy különleges karakterek nélkül;
+hint: host.>> lan <<.intranet."
+LOCAL120="Ha nem ír be semmilyen nevet, a sparky kerül alapértelmezettként használatba"
+LOCAL121="Írja be a kívánt rendszer-gazdafiók samba jelszavát, kérjük, kövesse a jelszavak bonyolultságára vonatkozó Microsoft szabványt.”
+LOCAL122=" Írja be a kívánt rendszer-gazdafiók samba jelszavát még egyszer.”
+LOCAL123="A jelszavak nem egyeznek. Kísérelje meg újra”
+LOCAL124="Írjon be legalább egy DNS szervert a tartományon kívüli feloldáshoz továbbításra; ha egynél több, válassza el szóközzel (állítsa be tűzfalát, átjáróját vagy a google 8.8.8.8-at)!"
+LOCAL125="Ha nem ír elő semmit, a 8.8.8.8 és 2001:4860:4860::8888 (google) DNS alapértelmezettként kerül használatba"
+LOCAL126="Írja be a kívánt oldal/webhely nevet (nincsenek/ne legyenek különleges karakterek); sugallat: lehet városnak a neve."
+LOCAL127="Ha nem ír be semmilyen  oldal/webhely nevet, a Föld lesz az alapértelmezett."
+LOCAL128="Kíván megosztani mappákat ezen a szerveren a felhasználó mappán kívül?\nA következő ablak lehetővé teszi Önnek, hogy a megosztott mappa útvonalát kialakítsa. Az összes mappa és almappa, ha még nem létezne, kialakításra kerül.\nNE használja a korábban létrehozott samba root nevet!"
+LOCAL129="Írja be a megosztott mappa útvonalát az alsó ablakba!"
+LOCAL130="Írja be a samba felhasználók root mappa nevét, amelyik a ´home´ könyvtárba fog kerülni. El kell térnie más linux felhasználók nevétől. Ellenkező esetben a sparkysmb kerül felhasználásra."
+LOCAL131="A samba root mappa neve azonos a cél linux felhasználó nevével, próbáljon mást!"
+LOCAL132="A megosztott root mappa neve tartalmazza a samba root nevét, így NEM tudja használni!"
+LOCAL133="A megosztott root mappa neve üres, próbálja újra!"
+LOCAL134="Meg kíván osztani ezen a szerveren más mappát (is)?\nA következő ablak lehetővé teszi Önnek, hogy a megosztott mappa útvonalát kialakítsa. Az összes mappa és almappa, ha még nem létezne, kialakításra kerül.\nNE használja a korábban létrehozott samba root nevet és amelyik mappát már megosztásra kiválasztott!"
+LOCAL135="Írja be a megosztott mappa nevét. Ha nem használ semmilyen nevet, a sparkydir.XXXX kerül alapértelmezettként használatba."
+LOCAL136="A szerver célzott csomagjai kívánt beállítása NEM került telepítésre! 
+LOCAL137="Kívánja telepíteni és frissíteni a Clamav antivírust? \(javasolt, de nem szükséges (kötelező)"
+LOCAL138="Kívánja telepíteni a hálózati forgalom felügyeleti felületet (netdata monitoring interface)? \n(javasolt, de nem szükséges (kötelező)"
+LOCAL139="Kívánja telepíteni a webmin-vezetési felületet (webmin management interface)? \n(ajánlott, mint alapértelmezett irányítási (management) felület, csak akkor mondjon nemet, ha tudja mit csinál)”
+LOCAL140="Válassza az igent egy létező mappához vagy hozzon létre egy újat”

@@ -1,0 +1,58 @@
+# File di localizzazione Italiano di Sparky AD Server.
+# Copyright 2018 Carlo Ttroiani <abbassolafrangetta@gmail.com> 2018/11/22
+# Rilasciato sotto licenza GNU GPL v2
+# Ultimo aggiornamento: 2018/11/23 by Carlo
+# Last update 2019/11/08 by pavroo
+# INFO FOR TRANSLATORS : When you find "\n" means a breakline into the dialog box, so text appear next line
+#                           If you feel the text will look better "cutted" here or there for your language
+#                           This can be used or changed from the original place. Thanks!
+#
+LOCAL1="Test della connessione internet fallito!"
+LOCAL2="L'installazione on-line di un'applicazione server NON puo' essere fatta!"
+LOCAL3="Sto uscendo..."
+LOCAL4="La configurazione del server e' impostata solamente sulla Debian/Sparky stabile."
+LOCAL5="Questa e' lo script post installazione della Directory Attiva di Sparky (AD) che installera' e configurera' tutto quello di cui hai bisogno per far girare un semplice AD Server file."
+LOCAL6="Vuoi continuare?"
+LOCAL7="Sparky AD Server Installer"
+LOCAL8="Non hai finito la configurazione di Sparky AD Server configuration la volta precedente.\nVuoi riprendere la configurazione dal punto dove ti sei fermato o preferisci reiniziare da capo?"
+LOCAL9="Comincia dall'inizio"
+LOCAL10="Continua dal punto dove l'installazione si e' fermata"
+LOCAL11="Hai gia' finito l'installazione di Sparky AD Server.\nVuoi ricominciare l'installazione da capo? \n (ATTENZIONE: COSI' FACENDO CANCELLERAI QUALSIASI FILE DI CONFIGURAZIONE PREESISTENTE!!)"
+#
+LOCAL106="Vuoi utilizzare il nomme del domminio che hai gia' impostato?"
+LOCAL107="Inserisci il nome TLD che vuoi utilizzare, utilizzane uno diverso da .local or .internal;  \nal massimo usa 15 caratteri, senza spazi o caratteri speciali;\nsuggerimento: host.lan.>> intranet << ; Se non inserisci alcun nome, sara' utilizzato quello predefinito di intranet."
+LOCAL108="Inserisci il nome del server che preferisci;\nQuesto sara' il nome di questa macchina sulla rete; \nusa al massimo 15 caratteri, senza spazi ne' caratteri speciali; \nsuggerimento: >> host <<.lan.intranet ; se non inserisci alcun nome, il nome predefinito server sara' utilizzato."
+LOCAL109="C'e' piu' di una scheda di rete o una porta da collegare?"
+LOCAL110="Questo pacchetto non e' disponibile per la versione del tuo sistema."
+LOCAL111="Vuoi installare il supporto per un gruppo di continuita' (UPS)?"
+LOCAL112="Vuoi controllare le impostazioni di rete e/o regolarle manualmente?"
+LOCAL113="NON posso trovare l'interfaccia del dispositivo di rete,"
+LOCAL114="dovrai settarla MANUALMENTE."
+LOCAL115="La configurazione della rete e' la seguente: puoi cambiarla o fermare l'installazione."
+LOCAL116="Inserisci i nomi dei tuoi dispositivi di rete separati da uno spazio, se ne vuoi vincolarne piu' di uno!"
+LOCAL117="dovrai settare la rete MANUALMENTE!"
+LOCAL118="Vuoi abilitare i BIP di avvertimento?"
+LOCAL119="Inserisci il nome del dominio che preferisci. \nDi solito si sceglie il nome della compagnia. \nusa non piu' di 15 battute, senza spazi, punti o caratteri speciali.; suggerimento: host.>> lan <<.intranet"
+LOCAL120="Se non inserisci alcun nome, sara' utilizzato quello predefinito di intranet"
+LOCAL121="Inserisci la password dell'account di amministratore di default di samba, nota che devi rispettare gli standard per la complessita' della password di Microsoft."
+LOCAL122="Inserisci di nuovo la password dell'account di amministratore di default di samba un'altra volta."
+LOCAL123="Le password non coincidono: proviamo di nuovo."
+LOCAL124="Inserisci l'indirizzo di almeno un server DNS per indirizzare la connessione al di fuori del dominio; se ne vuoi inserire piu' di uno dovranno essere separati da uno spazio (imposta questo sul tuo firewall, gateway o google 8.8.8.8)."
+#non e' farina del sacco mio o di pavel....
+LOCAL125="Se non inserisci alcun DNS, 8.8.8.8 2001:4860:4860::8888 (google) sara' usato come default"
+LOCAL126="Inserisci il nome del sito (non usare caratteri speciali); suggerimento: puo' essere il nome di una citta'."
+LOCAL127="Se non inserisci alcun nome, allora Earth sara' utilizzato di default."
+#non e' farina del sacco mio o di pavel....
+LOCAL128="Vuoi condividere le cartelle su questo server?\nLa prossima finestra ti permettera' di configurare il percorso delle cartelle condivise. Tutte le cartelle e le sotto-cartelle saranno create, se non dovessero esistere.\nNON utilizzare il nome di amministratore di samba che hai creato prima."
+LOCAL129="Inserisci il percorso alla cartella condivisa nella finestra qui sotto."
+LOCAL130="Inserisci il nome dell'amministratore di samba che sara' usato nella cartella home. Deve essere un nome diverso da quello dell'utente del sistema. In caso contrario, sara' utilizzato sparkysmb."
+LOCAL131="L'amministratore di samba non puo' avere lo stesso nome dell'utente del sistema su cui stai lavorando, Prova di nuovo."
+LOCAL132="Il nome della cartella condivisa contiene il nome dell'amministratore di samba, pertanto NON potra' essere utilizzato."
+LOCAL133="Il nome della cartella condivisa e' vuoto, prova di nuovo."
+LOCAL134="Vuoi condividere un'altra cartella su questo server?\nLa prossima finestra ti permettera' di configurare il percorso della cartella condivisa. Tutte le cartelle e le sott-cartelle saranno create, qualora non siano preesistenti.\nNON utilizzare il nome dell'amministratore di samba ne' le cartelle che hai gia' messo in condivisione."
+LOCAL135="Inserisci il nome della cartella condivisa. Se non inserisci alcun nome sara' utilizzato sparkydir.XXXX."
+LOCAL136="I set di pacchetti per server selezionati NON sono sono stati installati!"
+LOCAL137="Vuoi installare od aggiornare Clamav antivirus? \n(raccomandato, ma non richiesto)"
+LOCAL138="Vuoi installare od aggiornare l'interfaccia di monitoraggio netdata? \n(raccomandato, ma non richiesto))"
+LOCAL139="Vuoi installare l'interfaccia di gestione webmin? \n(raccomandato come interfaccia di gestione di default, scegli no unicamente se sai cosa stai facendo.)"
+LOCAL140="Seleziona si' per scegliere una cartella esistente, no per crearne una nuova"

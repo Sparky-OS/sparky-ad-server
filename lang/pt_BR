@@ -1,0 +1,57 @@
+# Portuguese Brazil localization file for Sparky Backup Server.
+# Copyright 2018 Paweł "pavroo" Pijanowski <pavroo@onet.eu> 2018/09/26
+# Under the GNU GPL v2
+# Translated by Daniel Campos Ramos 2018/10/28
+# Last update 2019/03/14 by Daniel
+#
+# INFORMAÇÃO AOS TRADUTORES : Quando encontrar um "\n" significa uma quebra de linha na caixa de diálogo, para que o texto apareça na próxima linha
+#                           Se você sentir que o texto ficará melhor distribuido aqui ou ali para a sua língua,
+#                           Este recurso pode ser utilizado ou modificado de seu local original. Thanks!
+#
+LOCAL1="Teste de conexão com a Internet falhou!"
+LOCAL2="Uma instalação On-line de um aplicativo não pode ser feita!"
+LOCAL3="Saindo agora..."
+LOCAL4="Esta configuração de servidor está disponível apenas para a linha estável do Debian/Sparky."
+LOCAL5="Este é o script de instalação pós instalação do Sparky Active Directory (AD) que irá instalare configurar tudo que você precisa para rodar um servidor de arquivos AD simples."
+LOCAL6="Continuar?"
+LOCAL7="Instalador do Sparky AD Server"
+LOCAL8="A configuração do Sparky AD Server não terminou completamente da última vez.\nGostaria de continuar a instalação de onde parou ou começar do início?"
+LOCAL9="Começar do início"
+LOCAL10="Continuar do ponto onde a instalação foi interrompida anteriormente"
+LOCAL11="Você já concluiu a configuração do Sparky AD Server.\nGostaria de reconfigurar do início? \n(AVISO ISSO APAGARÁ QUALQUER CONFIGURAÇÃO PREVIAMENTE EXISTENTE!!)"
+#
+LOCAL106="Gostaria de utilizar o nome de domínio já configurado?"
+LOCAL107="Digite o TLD desejado, use um inválido diferente de .local ou .internal; Sem espaços ou caracteres especiais; \ndica host.lan.>> intranet << ; Se não digitar nenhum nome, o nome padrão intranet será utilizado."
+LOCAL108="Qual nome este servidor deve ter? \nEste será o nome desta máquina na rede \nSe nada for digitado, o nome padrão server será utilizado."
+LOCAL109="Existe mais de uma placa ou porta de rede para cascateamento?"
+LOCAL110="Este pacote não está disponível para esta versão de sistema."
+LOCAL111="Gostaria de instalar o suporte a No-Break (UPS)?"
+LOCAL112="Gostaria de verificar as configurações de rede atuais fixadas automáticamente e/ou configurar manualmente?"
+LOCAL113="Não foi possível encontrar um dispositivo de rede,"
+LOCAL114="você TEM que configurar manualmente."
+LOCAL115="A configuração de rede será como a seguir, instalar desta forma ou abortar a instalação?"
+LOCAL116="Entre com o nome ou nomes das interfaces de rede, se desejar unir mais de um; separado por espaço!"
+LOCAL117="você TEM que configurar a rede manualmente!"
+LOCAL118="Gostaria de instalar o serviço de aviso sonoro com pcspeaker sparky-beep?"
+LOCAL119="Entre com o nome de domínio desejado; \nAqui é onde normalmente se coloca o nome da empresa. \n15 caracteres no máximo sem espaços, pontos ou caracteres especiais; \ndica: host.>> lan <<.intranet"
+LOCAL120="Se nenhum nome for digitado, o nome padrão sparky será utilizado."
+LOCAL121="Entre com a senha da conta do administrador padrão do samba, por favor, siga o padrão de criação de senha segura Microsoft."
+LOCAL122="Entre novamente com a mesma senha da conta do administrador do samba."
+LOCAL123="As senhas digitadas não são iguais! Vamos tentar novamente."
+LOCAL124="Entre com no mínimo 1 servidor DNS válido para encaminhar a resolução de nome fora do domínio; separado por espaço (coloque o endereço do seu firewall, gateway ou google 8.8.8.8)."
+LOCAL125="Se nenhum for fornecido, o servidor DNS padrão serão 8.8.8.8 e 2001:4860:4860::8888 (google)"
+LOCAL126="Entre com o nome de site desejado (sem caracteres especiais); dica: pode ser a cidade ou bairro."
+LOCAL127="Se não entrar com nenhum nome, o nome Earth (terra) será utilizado como padrão."
+LOCAL128="Gostaria de compartilhar outras pastas neste servidor além das dos usuários?\nA próxima janela permite configurar um nome e um caminho para a pasta compartilhada. Todas as pastas e subpastas serão criados se ainda não existirem.\nNão utilize um nome de usuário ou compartilhamento que já criou anteriormente."
+LOCAL129="Entre com o caminho para a pasta na janela inferior."
+LOCAL130="O nome do diretório raiz dos usuários do samba que será colocado no diretório home. Tem que ser diferente de qualquer usuário do linux. De outra forma, o nome padrão sparkysmb será utilizado."
+LOCAL131="O nome do diretório raiz do samba é o mesmo que de uma conta do linux, use outro."
+LOCAL132="O nome do compartilhamento contém o nome raiz do samba então NÃO pode ser utilizado!"
+LOCAL133="O nome do compartilhamento está vazio, tente novamente."
+LOCAL134="Gostaria de compartilhar outra pasta neste servidor?\nA próxima janela permite configurar um nome e um caminho para a pasta compartilhada. Todas as pastas e subpastas serão criados se ainda não existirem.\nNão utilize um nome de usuário ou compartilhamento que já criou anteriormente."
+LOCAL135="Entre com o nome do compartilhamento. Se não digitar nenhum nome, um diretório padrão será criado no formato sparkydir.XXXX"
+LOCAL136="Os pacotes requeridos para o servidor NÃO FORAM instalados!"
+LOCAL137="Gostaria de instalar e atualizar o anti vírus Clamav? \n(recomendado, não requerido)"
+LOCAL138="Gostaria de instalar a interface de monitoramento netdata? \n(recomendado, não requerido)"
+LOCAL139="Gostaria de instalar a interface de gerenciamento webmin? \n(recomendado e é a interface padrão, apenas responda não se souber o que está fazendo.)"
+LOCAL140="Selecione yes para escolher um diretório existente ou no para criar 1 novo"
