@@ -25,11 +25,30 @@
 #    - Suppress useless tar "socket ignored" message.
 #    - Fix retention period bug when deleting old backups ($DAYS variable
 #      could be set, but was ignored).
+#
+# Creates a backup of the Samba AD DC provision.
+#
+# This script stops the Samba AD DC service, creates a backup of the
+# sysvol, private, and Samba configuration files, and then restarts
+# the service. The backup is stored as a compressed tar archive.
+#
+# Usage:
+#   samba_backup [provisiondir] [destinationdir] [retpd]
+#
+# Parameters:
+#   provisiondir    The directory where the Samba provision is located.
+#                   Defaults to the directory found by `find /home/ -iname precopy`.
+#   destinationdir  The directory where the backup archive will be stored.
+#                   Defaults to the directory found by `find /home/ -iname samba_backup`.
+#   retpd           The retention period in days for the backups.
+#                   Defaults to 90.
+#
+# A parameter can be left at its default value by specifying "-".
 
-PRECOPY='find /home/ -iname precopy'
-SMBBKP='find /home/ -iname samba_backup'
-SYSVOL='find / -iname sysvol'
-PRIVATE='find / -iname private'
+PRECOPY=$(find /home/ -iname precopy)
+SMBBKP=$(find /home/ -iname samba_backup)
+SYSVOL=$(find / -iname sysvol)
+PRIVATE=$(find / -iname private)
 SMBCONF=/etc/samba
 FROMWHERE=$PRECOPY
 WHERE=$SMBBKP
@@ -38,18 +57,18 @@ DIRS="private samba sysvol"
 
 systemctl stop samba-ad-dc.service
 # Create pre-copy
-# cp -rfvp  $PRECOPY
-cp -rfvp $SYSVOL $PRECOPY
-cp -rfvp $PRIVATE $PRECOPY
-cp -rfvp $SMBCONF $PRECOPY
-cp -rfvp /etc/samba/smb.conf $PRECOPY
-cp -rfvp /var/lib/samba/private/krb5.conf $PRECOPY
-cp -rfvp /etc/nsswitch.conf $PRECOPY
+# cp -rfvp  "$PRECOPY"
+cp -rfvp "$SYSVOL" "$PRECOPY"
+cp -rfvp "$PRIVATE" "$PRECOPY"
+cp -rfvp "$SMBCONF" "$PRECOPY"
+cp -rfvp /etc/samba/smb.conf "$PRECOPY"
+cp -rfvp /var/lib/samba/private/krb5.conf "$PRECOPY"
+cp -rfvp /etc/nsswitch.conf "$PRECOPY"
 
 systemctl start samba-ad-dc.service
 
 
-if [ -n "$1" ] && [ "$1" = "-h" -o "$1" = "--usage" ]; then
+if [ -n "$1" ] && { [ "$1" = "-h" ] || [ "$1" = "--usage" ]; }; then
 	echo "samba_backup [provisiondir] [destinationdir] [retpd]"
 	echo "Will backup your provision located in provisiondir to archive stored"
 	echo "in destinationdir for retpd days. Use - to leave an option unchanged."
@@ -59,56 +78,55 @@ if [ -n "$1" ] && [ "$1" = "-h" -o "$1" = "--usage" ]; then
 	exit 0
 fi
 
-[ -n "$1" -a "$1" != "-" ]&&FROMWHERE=$1	# Use parm or default if "-".  Validate later.
-[ -n "$2" -a "$2" != "-" ]&&WHERE=$2		# Use parm or default if "-".  Validate later.
-[ -n "$3" -a "$3" -eq "$3" 2> /dev/null ]&&DAYS=$3	# Use parm or default if non-numeric (incl "-").
+if [ -n "$1" ] && [ "$1" != "-" ]; then FROMWHERE=$1; fi	# Use parm or default if "-".  Validate later.
+if [ -n "$2" ] && [ "$2" != "-" ]; then WHERE=$2; fi		# Use parm or default if "-".  Validate later.
+if [ -n "$3" ] && [ "$3" -eq "$3" ] 2>/dev/null; then DAYS=$3; fi
 
 #Number of days to keep the backup
-WHEN=`date +%Y-%m-%d`	# ISO 8601 standard date.
+WHEN=$(date +%Y-%m-%d)	# ISO 8601 standard date.
 
-if [ ! -d $WHERE ]; then
+if [ ! -d "$WHERE" ]; then
 	echo "Missing backup directory $WHERE"
 	exit 1
 fi
 
-if [ ! -d $FROMWHERE ]; then
+if [ ! -d "$FROMWHERE" ]; then
 	echo "Missing or wrong provision directory $FROMWHERE"
 	exit 1
 fi
 
-cd $FROMWHERE
+cd "$FROMWHERE" || exit
 for d in $DIRS;do
-	relativedirname=`find . -type d -name "$d" -prune`
-	n=`echo $d | sed 's/\//_/g'`
+	relativedirname=$(find . -type d -name "$d" -prune)
+	n=$(echo "$d" | sed 's/\//_/g')
 	if [ "$d" = "private" ]; then
-		find $relativedirname -name "*.ldb.bak" -exec rm {} \;
-		for ldb in `find $relativedirname -name "*.ldb"`; do
-			tdbbackup $ldb
+		find "$relativedirname" -name "*.ldb.bak" -exec rm {} \;
+		find "$relativedirname" -name "*.ldb" -exec tdbbackup {} \; | while read -r ldb; do
 			Status=$?	# Preserve $? for message, since [ alters it.
-			if [ $Status -ne 0 ]; then
+			if [ "$Status" -ne 0 ]; then
 				echo "Error while backing up $ldb - status $Status"
 				exit 1
 			fi
 		done
 		# Run the backup.
 		#    --warning=no-file-ignored set to suppress "socket ignored" messages.
-		tar cjf ${WHERE}/samba4_${n}.${WHEN}.tar.bz2  $relativedirname --exclude=\*.ldb --warning=no-file-ignored --transform 's/.ldb.bak$/.ldb/'
+		tar cjf "${WHERE}/samba4_${n}.${WHEN}.tar.bz2" "$relativedirname" --exclude=\*.ldb --warning=no-file-ignored --transform 's/.ldb.bak$/.ldb/'
 		Status=$?	# Preserve $? for message, since [ alters it.
-		if [ $Status -ne 0 -a $Status -ne 1 ]; then	# Ignore 1 - private dir is always changing.
+		if [ "$Status" -ne 0 ] && [ "$Status" -ne 1 ]; then	# Ignore 1 - private dir is always changing.
 			echo "Error while archiving ${WHERE}/samba4_${n}.${WHEN}.tar.bz2 - status = $Status"
 			exit 1
 		fi
-		find $relativedirname -name "*.ldb.bak" -exec rm {} \;
+		find "$relativedirname" -name "*.ldb.bak" -exec rm {} \;
 	else
 		# Run the backup.
 		#    --warning=no-file-ignored set to suppress "socket ignored" messages.
-		tar cjf ${WHERE}/${n}.${WHEN}.tar.bz2  $relativedirname --warning=no-file-ignored
+		tar cjf "${WHERE}/${n}.${WHEN}.tar.bz2" "$relativedirname" --warning=no-file-ignored
 		Status=$?	# Preserve $? for message, since [ alters it.
-		if [ $Status -ne 0 ]; then
+		if [ "$Status" -ne 0 ]; then
 			echo "Error while archiving ${WHERE}/${n}.${WHEN}.tar.bz2 - status = $Status"
 			exit 1
 		fi
 	fi
 done
 
-find $WHERE -name "samba4_*bz2" -mtime +$DAYS -exec rm  {} \;
+find "$WHERE" -name "samba4_*bz2" -mtime "+$DAYS" -exec rm {} \;
