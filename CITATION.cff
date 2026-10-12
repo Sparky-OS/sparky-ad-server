@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+type: software
+title: "sparky-ad-server: a Samba 4 Active Directory domain controller installer"
+abstract: "Installs a Samba 4 Active Directory domain controller on SparkyLinux and Debian."
+authors:
+  - family-names: "Ramos"
+    given-names: "Daniel Campos"
+    orcid: "https://orcid.org/0009-0001-4546-8673"
+license: GPL-3.0-or-later
+repository-code: "https://github.com/Sparky-OS/sparky-ad-server"
+keywords:
+  - "SparkyLinux"
+  - "Debian"
+  - "small-business server"
+  - "Bash"
+  - "Active Directory"
+  - "Samba"
+  - "domain controller"

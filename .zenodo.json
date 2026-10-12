@@ -1,0 +1,36 @@
+{
+  "title": "sparky-ad-server: a Samba 4 Active Directory domain controller installer",
+  "description": "Installs a Samba 4 Active Directory domain controller on SparkyLinux and Debian.",
+  "creators": [
+    {
+      "name": "Ramos, Daniel Campos",
+      "orcid": "0009-0001-4546-8673"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Pijanowski, Paweł",
+      "affiliation": "SparkyLinux",
+      "type": "ProjectLeader"
+    }
+  ],
+  "license": "gpl-3.0-or-later",
+  "upload_type": "software",
+  "access_right": "open",
+  "keywords": [
+    "SparkyLinux",
+    "Debian",
+    "small-business server",
+    "Bash",
+    "Active Directory",
+    "Samba",
+    "domain controller"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://sparkylinux.org/",
+      "relation": "isPartOf",
+      "scheme": "url"
+    }
+  ]
+}
