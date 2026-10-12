@@ -1,5 +1,7 @@
 # Sparky AD Server
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23309050.svg)](https://doi.org/10.5281/zenodo.23309050)
+
 This repository provides a post-installation script to configure a Samba Active Directory (AD) Domain Controller (DC) on SparkyLinux and other Debian-based systems. The script automates the setup process, including dependency installation, network configuration, and Samba provisioning.
 
 ## Features
